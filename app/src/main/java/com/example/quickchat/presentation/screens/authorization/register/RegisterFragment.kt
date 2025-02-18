@@ -23,6 +23,7 @@ class RegisterFragment : BaseFragment<FragmentRegisterBinding>(FragmentRegisterB
         Log.d("PhoneAuth", "Firebase Auth initialized: $auth")
         binding.btnSend.setOnClickListener {
             val phoneNumber = binding.userMobile.text.toString().trim()
+            Log.d("Number", phoneNumber)
 
             if (phoneNumber.isNotEmpty()) {
                 Log.d("PhoneAuth", "User entered phone: $phoneNumber")  // Log phone number
