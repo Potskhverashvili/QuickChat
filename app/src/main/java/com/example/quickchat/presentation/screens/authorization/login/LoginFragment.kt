@@ -26,6 +26,9 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
             }
             true
         }
+
+        // Trigger verification when the submit button is clicked
+        goToHomePage()
     }
 
     private fun verifyCode(code: String) {
@@ -37,10 +40,22 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
         auth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+                    // Navigate to HomeFragment on successful sign-in
                     findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToHomeFragment())
                 } else {
                     Toast.makeText(requireContext(), "Invalid OTP!", Toast.LENGTH_SHORT).show()
                 }
             }
+    }
+
+    private fun goToHomePage() {
+        binding.btnSubmit.setOnClickListener {
+            val code = binding.codeNumbers.text.toString().trim()
+            if (code.isNotEmpty()) {
+                verifyCode(code) // Call verifyCode with the inputted code
+            } else {
+                Toast.makeText(requireContext(), "Enter the 6-digit code", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }
