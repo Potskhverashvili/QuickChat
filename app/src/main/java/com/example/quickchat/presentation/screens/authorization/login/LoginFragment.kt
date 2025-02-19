@@ -14,15 +14,15 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
         auth = FirebaseAuth.getInstance()
 
         binding.btnLogin.setOnClickListener {
-            val email = binding.userEmail.text.toString().trim()
-            val password = binding.userPassword.text.toString().trim()
+            val email = binding.emailEditText.text.toString().trim()
+            val password = binding.passwordEditText.text.toString().trim()
 
             if (areFieldsValid(email, password)) {
                 loginUser(email, password)
             }
         }
 
-        binding.btnRegisterRedirect.setOnClickListener {
+        binding.registerBtn.setOnClickListener {
             navigateToRegisterFragment()
         }
     }

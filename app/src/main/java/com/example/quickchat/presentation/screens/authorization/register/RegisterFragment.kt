@@ -14,9 +14,9 @@ class RegisterFragment : BaseFragment<FragmentRegisterBinding>(FragmentRegisterB
         auth = FirebaseAuth.getInstance()
 
         binding.registerBtn.setOnClickListener {
-            val email = binding.userEmail.text.toString().trim()
-            val password = binding.userPassword.text.toString().trim()
-            val repeatPassword = binding.repeatUserPassword.text.toString().trim()
+            val email = binding.emailEditText.text.toString().trim()
+            val password = binding.passwordEditText.text.toString().trim()
+            val repeatPassword = binding.repeatPasswordEditText.text.toString().trim()
 
             if (areFieldsValid(email, password, repeatPassword)) {
                 registerUser(email, password)
