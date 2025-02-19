@@ -13,9 +13,10 @@
         android:layout_marginTop="80dp"
         android:letterSpacing="0.01"
         android:text="Register"
-        android:textColor="@color/black"
+        android:textColor="?android:textColor"
         android:textSize="32sp"
         android:textStyle="bold"
+        app:fontFamily="@font/poppins_medium"
         app:layout_constraintStart_toStartOf="@+id/usernameInputLayout"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -40,7 +41,7 @@
             android:inputType="textPersonName"
             android:maxLength="40"
             android:singleLine="true"
-            android:textColor="@color/black"
+            android:textColor="?android:textColor"
             android:textColorHint="@color/white" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -65,7 +66,7 @@
             android:inputType="textEmailAddress"
             android:maxLength="50"
             android:singleLine="true"
-            android:textColor="@color/black"
+            android:textColor="?android:textColor"
             android:textColorHint="@color/white" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -77,10 +78,10 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="24dp"
+        android:textColor="?android:textColor"
+        app:boxStrokeColor="@color/color_blue"
         app:endIconCheckable="true"
         app:endIconMode="password_toggle"
-        app:endIconTint="@color/white"
-        app:boxStrokeColor="@color/color_blue"
         app:layout_constraintTop_toBottomOf="@id/emailInputLayout"
         app:passwordToggleDrawable="@drawable/ic_eye_selector"
         app:passwordToggleEnabled="true">
@@ -94,7 +95,7 @@
             android:inputType="textPassword"
             android:maxLength="40"
             android:singleLine="true"
-            android:textColor="@color/black" />
+            android:textColor="?android:textColor" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -105,10 +106,10 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="24dp"
+        android:textColor="?android:textColor"
+        app:boxStrokeColor="@color/color_blue"
         app:endIconCheckable="true"
         app:endIconMode="password_toggle"
-        app:endIconTint="@color/white"
-        app:boxStrokeColor="@color/color_blue"
         app:layout_constraintTop_toBottomOf="@id/passwordInputLayout"
         app:passwordToggleDrawable="@drawable/ic_eye_selector"
         app:passwordToggleEnabled="true">
@@ -122,7 +123,7 @@
             android:inputType="textPassword"
             android:maxLength="40"
             android:singleLine="true"
-            android:textColor="@color/black" />
+            android:textColor="?android:textColor" />
     </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -152,7 +153,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="2dp"
             android:text="Already have an account?"
-            android:textColor="@color/black"
+            android:textColor="?android:textColor"
             android:textSize="16sp" />
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -162,9 +163,19 @@
             android:layout_marginStart="2dp"
             android:clickable="true"
             android:text="Log in"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:textSize="18sp" />
+            android:textColor="?android:textColor"
+            android:textSize="18sp"
+            android:textStyle="bold" />
     </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

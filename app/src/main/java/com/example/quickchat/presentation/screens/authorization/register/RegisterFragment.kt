@@ -1,61 +1,72 @@
 package com.example.quickchat.presentation.screens.authorization.register
 
+import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.quickchat.core.BaseFragment
 import com.example.quickchat.databinding.FragmentRegisterBinding
-import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class RegisterFragment : BaseFragment<FragmentRegisterBinding>(FragmentRegisterBinding::inflate) {
-
-    private lateinit var auth: FirebaseAuth
+    private val viewModel by viewModel<RegisterViewModel>()
 
     override fun viewCreated() {
-        auth = FirebaseAuth.getInstance()
+        setListeners()
+        setCollectors()
+    }
 
+    private fun setListeners() {
         binding.registerBtn.setOnClickListener {
-            val email = binding.emailEditText.text.toString().trim()
-            val password = binding.passwordEditText.text.toString().trim()
-            val repeatPassword = binding.repeatPasswordEditText.text.toString().trim()
-
-            if (areFieldsValid(email, password, repeatPassword)) {
-                registerUser(email, password)
+            val userName = binding.userNameEditText.text.toString()
+            val email = binding.emailEditText.text.toString()
+            val password = binding.passwordEditText.text.toString()
+            val repeatPassword = binding.repeatPasswordEditText.text.toString()
+            val isValid = viewModel.isRegistrationValid(userName, email, password, repeatPassword)
+            if (isValid) {
+                viewModel.registerNewUser(userName, email, password)
             }
         }
 
         binding.loginBtn.setOnClickListener {
-            navigateToLoginFragment()
+            goToLogInPage()
         }
     }
 
-    private fun areFieldsValid(email: String, password: String, repeatPassword: String): Boolean {
-        if (email.isEmpty() || password.isEmpty() || repeatPassword.isEmpty()) {
-            Toast.makeText(requireContext(), "Please fill all fields", Toast.LENGTH_SHORT).show()
-            return false
-        }
-        if (password != repeatPassword) {
-            Toast.makeText(requireContext(), "Passwords do not match", Toast.LENGTH_SHORT).show()
-            return false
-        }
-        return true
-    }
-
-    private fun registerUser(email: String, password: String) {
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(requireActivity()) { task ->
-                if (task.isSuccessful) {
-                    navigateToHomeFragment()
-                } else {
-                    Toast.makeText(requireContext(), "Registration failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
-    }
-
-    private fun navigateToHomeFragment() {
-        findNavController().navigate(RegisterFragmentDirections.actionRegisterFragmentToHomeFragment())
-    }
-
-    private fun navigateToLoginFragment() {
+    private fun goToLogInPage() {
         findNavController().navigate(RegisterFragmentDirections.actionRegisterFragmentToLoginFragment())
     }
+
+    private fun setCollectors() {
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.registerFlow.collect {
+                    findNavController().navigate(RegisterFragmentDirections.actionRegisterFragmentToHomeFragment())
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.showError.collect { errorMessage ->
+                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.isLoadingState.collect { isLoading ->
+                    binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+                }
+            }
+        }
+
+    }
+
 }

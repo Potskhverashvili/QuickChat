@@ -10,7 +10,7 @@ class WelcomeFragment : BaseFragment<FragmentWelcomeBinding>(FragmentWelcomeBind
         goToRegister()
     }
 
-    private fun goToRegister(){
+    private fun goToRegister() {
         binding.btnWelcome.setOnClickListener {
             findNavController().navigate(WelcomeFragmentDirections.actionWelcomeFragmentToRegisterFragment())
         }
