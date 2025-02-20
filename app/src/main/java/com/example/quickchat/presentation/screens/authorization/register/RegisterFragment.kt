@@ -8,7 +8,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.quickchat.core.BaseFragment
 import com.example.quickchat.databinding.FragmentRegisterBinding
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -37,9 +36,6 @@ class RegisterFragment : BaseFragment<FragmentRegisterBinding>(FragmentRegisterB
         }
     }
 
-    private fun goToLogInPage() {
-        findNavController().navigate(RegisterFragmentDirections.actionRegisterFragmentToLoginFragment())
-    }
 
     private fun setCollectors() {
 
@@ -67,6 +63,10 @@ class RegisterFragment : BaseFragment<FragmentRegisterBinding>(FragmentRegisterB
             }
         }
 
+    }
+
+    private fun goToLogInPage() {
+        findNavController().navigate(RegisterFragmentDirections.actionRegisterFragmentToLoginFragment())
     }
 
 }

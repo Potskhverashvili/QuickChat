@@ -11,7 +11,7 @@ import kotlinx.coroutines.tasks.await
 class FirebaseRepositoryImpl(
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
-    ): FirebaseRepository {
+) : FirebaseRepository {
 
     override suspend fun registerNewUser(
         username: String,
@@ -31,4 +31,10 @@ class FirebaseRepositoryImpl(
         }
     }
 
+    override suspend fun logInUser(email: String, password: String): OperationStatus<FirebaseUser> {
+        return FirebaseCallHelper.safeFirebaseCall {
+            val authResult = auth.signInWithEmailAndPassword(email, password).await()
+            authResult.user!!
+        }
+    }
 }

@@ -9,4 +9,5 @@ interface FirebaseRepository {
         username: String, email: String, password: String
     ): OperationStatus<FirebaseUser>
 
+    suspend fun logInUser(email: String, password: String) : OperationStatus<FirebaseUser>
 }

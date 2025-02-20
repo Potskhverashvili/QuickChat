@@ -1,60 +1,72 @@
 package com.example.quickchat.presentation.screens.authorization.login
 
+import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.quickchat.core.BaseFragment
 import com.example.quickchat.databinding.FragmentLoginBinding
-import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::inflate) {
-
-    private lateinit var auth: FirebaseAuth
+    private val viewModel by viewModel<LoginViewModel>()
 
     override fun viewCreated() {
-        auth = FirebaseAuth.getInstance()
+        setListeners()
+        setCollectors()
+    }
 
-        binding.btnLogin.setOnClickListener {
-            val email = binding.emailEditText.text.toString().trim()
-            val password = binding.passwordEditText.text.toString().trim()
-
-            if (areFieldsValid(email, password)) {
-                loginUser(email, password)
+    private fun setListeners() = with(binding) {
+        btnLogin.setOnClickListener {
+            val email = emailEditText.text.toString().trim()
+            val password = passwordEditText.text.toString().trim()
+            val isFieldsValid = viewModel.areFieldsValid(email, password)
+            if (isFieldsValid) {
+                viewModel.loginUser(email, password)
             }
         }
 
-        binding.registerBtn.setOnClickListener {
-            navigateToRegisterFragment()
+        registerBtn.setOnClickListener {
+            goToRegisterFragment()
         }
     }
 
-    private fun areFieldsValid(email: String, password: String): Boolean {
-        if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(requireContext(), "Please fill all fields", Toast.LENGTH_SHORT).show()
-            return false
-        }
-        return true
-    }
 
-    private fun loginUser(email: String, password: String) {
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(requireActivity()) { task ->
-                if (task.isSuccessful) {
-                    navigateToHomeFragment()
-                } else {
-                    Toast.makeText(
-                        requireContext(),
-                        "Login failed: ${task.exception?.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+    private fun setCollectors() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.loginFlow.collect {
+                    goToHomeFragment()
                 }
             }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.isLoadingState.collect { isLoading ->
+                    binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.showError.collect { errorMessage ->
+                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 
-    private fun navigateToHomeFragment() {
+
+    private fun goToHomeFragment() {
         findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToHomeFragment())
     }
 
-    private fun navigateToRegisterFragment() {
+    private fun goToRegisterFragment() {
         findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToRegisterFragment())
     }
 }
