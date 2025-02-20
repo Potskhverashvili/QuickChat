@@ -2,17 +2,20 @@ package com.example.quickchat.presentation.screens.authorization.register
 
 import android.view.View
 import android.widget.Toast
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.quickchat.core.BaseFragment
 import com.example.quickchat.databinding.FragmentRegisterBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
+@AndroidEntryPoint
 class RegisterFragment : BaseFragment<FragmentRegisterBinding>(FragmentRegisterBinding::inflate) {
-    private val viewModel by viewModel<RegisterViewModel>()
+    private val viewModel by viewModels<RegisterViewModel>()
 
     override fun viewCreated() {
         setListeners()
@@ -34,6 +37,7 @@ class RegisterFragment : BaseFragment<FragmentRegisterBinding>(FragmentRegisterB
         binding.loginBtn.setOnClickListener {
             goToLogInPage()
         }
+
     }
 
 
@@ -42,7 +46,7 @@ class RegisterFragment : BaseFragment<FragmentRegisterBinding>(FragmentRegisterB
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.registerFlow.collect {
-                    findNavController().navigate(RegisterFragmentDirections.actionRegisterFragmentToHomeFragment())
+                    findNavController().navigate(RegisterFragmentDirections.actionRegisterFragmentToContainerFragment())
                 }
             }
         }

@@ -2,8 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("androidx.navigation.safeargs.kotlin")
-    id("com.google.devtools.ksp")
+//    id("com.google.devtools.ksp")
     alias(libs.plugins.google.gms.google.services)
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -39,6 +41,10 @@ android {
 
     buildFeatures{
         viewBinding = true
+    }
+    // Allow references to generated code
+    kapt {
+        correctErrorTypes = true
     }
 }
 
@@ -91,7 +97,7 @@ dependencies {
     //---------------- Room Database -----------------
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
+//    ksp(libs.androidx.room.compiler)
 
     // ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
@@ -100,5 +106,9 @@ dependencies {
     // Circular image dependencies
 
     // Shimmer dependency
+
+    // hilt dependance
+    implementation("com.google.dagger:hilt-android:2.51.1")
+    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
 
 }
