@@ -39,7 +39,7 @@ android {
         jvmTarget = "11"
     }
 
-    buildFeatures{
+    buildFeatures {
         viewBinding = true
     }
     // Allow references to generated code
@@ -71,7 +71,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
 
 
-     // Kotlin Symbol Processing - KSP
+    // Kotlin Symbol Processing - KSP
 
     // Circular image dependencies
     implementation(libs.circleimageview)
