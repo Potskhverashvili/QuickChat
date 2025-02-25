@@ -11,9 +11,9 @@ import com.example.quickchat.domain.model.UsersModel
 class ChatPageAdapter(
     private val usersList: List<UsersModel>,
     private val activeUsersAdapter: ActiveUserAdapter
-
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    var onSearchedClick: () -> Unit = {}
 
     inner class ActiveUsersViewHolder(private val binding: ItemActiveUsersRvBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -29,15 +29,20 @@ class ChatPageAdapter(
         }
     }
 
-
-    class SearchViewHolder(binding: ItemSearchBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class SearchViewHolder(private val binding: ItemSearchBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind() {
+            binding.root.setOnClickListener {
+                onSearchedClick.invoke()
+            }
+        }
+    }
 
     //----------------------------------------------------------------------
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
 
-            // --- Categories ---
             VIEW_TYPE_ACTIVE_USERS -> {
                 val binding = ItemActiveUsersRvBinding.inflate(
                     LayoutInflater.from(parent.context),
@@ -47,7 +52,6 @@ class ChatPageAdapter(
                 ActiveUsersViewHolder(binding)
             }
 
-            // --- Products ---
             VIEW_TYPE_SEARCH -> {
                 val binding =
                     ItemSearchBinding.inflate(
@@ -58,7 +62,6 @@ class ChatPageAdapter(
                 SearchViewHolder(binding)
             }
 
-            // ---- Footer ----
             VIEW_TYPE_USERS -> {
                 val binding = ItemUserBinding.inflate(
                     LayoutInflater.from(parent.context),
@@ -79,14 +82,14 @@ class ChatPageAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is ActiveUsersViewHolder -> holder.bind()
-            is UsersViewHolder -> holder.bind(usersList[position - 1])
+            is UsersViewHolder -> holder.bind(usersList[position - 2])
         }
     }
 
     override fun getItemViewType(position: Int): Int {
         return when (position) {
             0 -> VIEW_TYPE_ACTIVE_USERS
-            usersList.size + 1 ->    VIEW_TYPE_SEARCH
+            1 -> VIEW_TYPE_SEARCH
             else -> VIEW_TYPE_USERS
         }
     }
