@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/chatFragment"
-        android:name="com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.ChatFragment"
+        android:name="com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.mainChatPage.MainChatPageFragment"
         android:label="ChatFragment"
-        tools:layout="@layout/fragment_chat"/>
+        tools:layout="@layout/fragment_main_chat_page"/>
 
     <fragment
         android:id="@+id/profileFragment"

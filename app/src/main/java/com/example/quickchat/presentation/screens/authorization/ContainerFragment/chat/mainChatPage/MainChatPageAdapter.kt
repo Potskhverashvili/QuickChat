@@ -1,44 +1,59 @@
-package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat
+package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.mainChatPage
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quickchat.databinding.ItemActiveUsersRvBinding
 import com.example.quickchat.databinding.ItemSearchBinding
 import com.example.quickchat.databinding.ItemUserBinding
 import com.example.quickchat.domain.model.UsersModel
 
-class ChatPageAdapter(
-    private val usersList: List<UsersModel>,
-    private val activeUsersAdapter: ActiveUserAdapter
+class MainChatPageAdapter(
+
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    var activeUserAdapter = ActiveUserAdapter()
+    private var userList: List<UsersModel> = emptyList()
+
+    fun updateUsersList(newUsersList: List<UsersModel>) {
+        val userListCallBack = UserListCallBack(userList, newUsersList)
+        val diffResult = DiffUtil.calculateDiff(userListCallBack)
+        userList = newUsersList
+        diffResult.dispatchUpdatesTo(this)
+    }
+
+
     var onSearchedClick: () -> Unit = {}
+    var onUserClick: () -> Unit = {}
+
 
     inner class ActiveUsersViewHolder(private val binding: ItemActiveUsersRvBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind() {
-            binding.activeUsersRecyclerView.adapter = activeUsersAdapter
+            binding.activeUsersRecyclerView.adapter = activeUserAdapter
         }
     }
 
-    class UsersViewHolder(private val binding: ItemUserBinding) :
+    inner class UsersViewHolder(private val binding: ItemUserBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(userModel: UsersModel) {
             binding.itemUser.text = userModel.name
+            binding.root.setOnClickListener {
+                onUserClick.invoke()
+            }
         }
     }
 
     inner class SearchViewHolder(private val binding: ItemSearchBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind() {
-            binding.root.setOnClickListener {
+            binding.searchBtn.setOnClickListener {
                 onSearchedClick.invoke()
             }
         }
     }
 
-    //----------------------------------------------------------------------
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
@@ -67,7 +82,6 @@ class ChatPageAdapter(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
-
                 )
                 UsersViewHolder(binding)
             }
@@ -77,12 +91,13 @@ class ChatPageAdapter(
 
     }
 
-    override fun getItemCount() = usersList.size + 2
+    override fun getItemCount() = userList.size + 2
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is ActiveUsersViewHolder -> holder.bind()
-            is UsersViewHolder -> holder.bind(usersList[position - 2])
+            is SearchViewHolder -> holder.bind()
+            is UsersViewHolder -> holder.bind(userList[position - 2])
         }
     }
 
@@ -98,5 +113,26 @@ class ChatPageAdapter(
         const val VIEW_TYPE_ACTIVE_USERS = 0
         const val VIEW_TYPE_SEARCH = 1
         const val VIEW_TYPE_USERS = 2
+    }
+
+    class UserListCallBack(
+        private val oldList: List<UsersModel>,
+        private val newList: List<UsersModel>
+
+    ) : DiffUtil.Callback() {
+        override fun getOldListSize() = oldList.size
+        override fun getNewListSize(): Int = newList.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            val oldList = oldList[oldItemPosition]
+            val newList = newList[newItemPosition]
+            return oldList.id == newList.id
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            val oldList = oldList[oldItemPosition]
+            val newList = newList[newItemPosition]
+            return oldList == newList
+        }
     }
 }
