@@ -1,4 +1,4 @@
-package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat
+package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.mainChatPage
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,10 +11,15 @@ import com.example.quickchat.domain.model.ActiveUserModel
 class ActiveUserAdapter :
     ListAdapter<ActiveUserModel, ActiveUserAdapter.ActiveUserViewHolder>(ActiveUserItemCallBack()) {
 
-    class ActiveUserViewHolder(private val binding: ItemActiveUserBinding) :
+    var onActiveUserClick: () -> Unit = {}
+
+    inner class ActiveUserViewHolder(private val binding: ItemActiveUserBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(activeUser: ActiveUserModel) {
             binding.activeUserTv.text = activeUser.name
+            binding.root.setOnClickListener{
+                onActiveUserClick.invoke()
+            }
         }
     }
 
