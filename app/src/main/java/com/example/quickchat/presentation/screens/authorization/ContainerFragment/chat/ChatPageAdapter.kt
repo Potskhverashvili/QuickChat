@@ -11,7 +11,6 @@ import com.example.quickchat.domain.model.UsersModel
 class ChatPageAdapter(
     private val usersList: List<UsersModel>,
     private val activeUsersAdapter: ActiveUserAdapter
-
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 

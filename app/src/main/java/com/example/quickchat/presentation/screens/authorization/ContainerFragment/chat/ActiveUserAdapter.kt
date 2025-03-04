@@ -26,7 +26,6 @@ class ActiveUserAdapter :
         )
     )
 
-
     override fun onBindViewHolder(holder: ActiveUserViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
