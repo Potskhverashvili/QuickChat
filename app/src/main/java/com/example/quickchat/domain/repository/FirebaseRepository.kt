@@ -6,11 +6,14 @@ import com.google.firebase.auth.FirebaseUser
 
 interface FirebaseRepository {
     suspend fun registerNewUser(
-        username: String, email: String, password: String
+        username: String, email: String, password: String, status: String = "online"
     ): OperationStatus<FirebaseUser>
 
     suspend fun logInUser(email: String, password: String): OperationStatus<FirebaseUser>
 
-    suspend fun getUserProfileInfo():OperationStatus<UsersModel>
+    suspend fun getUserProfileInfo(): OperationStatus<UsersModel>
+
+    suspend fun getOnlineUsers(): OperationStatus<List<UsersModel>>
+    suspend fun userWentOffline(): OperationStatus<UsersModel>
 
 }

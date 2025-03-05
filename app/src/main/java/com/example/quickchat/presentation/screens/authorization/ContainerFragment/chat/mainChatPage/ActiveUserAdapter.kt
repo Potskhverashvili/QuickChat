@@ -6,16 +6,16 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quickchat.databinding.ItemActiveUserBinding
-import com.example.quickchat.domain.model.ActiveUserModel
+import com.example.quickchat.domain.model.UsersModel
 
 class ActiveUserAdapter :
-    ListAdapter<ActiveUserModel, ActiveUserAdapter.ActiveUserViewHolder>(ActiveUserItemCallBack()) {
+    ListAdapter<UsersModel, ActiveUserAdapter.ActiveUserViewHolder>(ActiveUserItemCallBack()) {
 
     var onActiveUserClick: () -> Unit = {}
 
     inner class ActiveUserViewHolder(private val binding: ItemActiveUserBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(activeUser: ActiveUserModel) {
+        fun bind(activeUser: UsersModel) {
             binding.activeUserTv.text = activeUser.name
             binding.root.setOnClickListener{
                 onActiveUserClick.invoke()
@@ -35,11 +35,11 @@ class ActiveUserAdapter :
         holder.bind(getItem(position))
     }
 
-    private class ActiveUserItemCallBack : DiffUtil.ItemCallback<ActiveUserModel>() {
-        override fun areItemsTheSame(oldItem: ActiveUserModel, newItem: ActiveUserModel) =
+    private class ActiveUserItemCallBack : DiffUtil.ItemCallback<UsersModel>() {
+        override fun areItemsTheSame(oldItem: UsersModel, newItem: UsersModel) =
             oldItem.id == newItem.id
 
-        override fun areContentsTheSame(oldItem: ActiveUserModel, newItem: ActiveUserModel) =
+        override fun areContentsTheSame(oldItem: UsersModel, newItem: UsersModel) =
             oldItem == newItem
     }
 }

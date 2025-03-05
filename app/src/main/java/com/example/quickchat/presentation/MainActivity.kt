@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        //user.signOut()
+        user.signOut()
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
@@ -37,5 +37,7 @@ class MainActivity : AppCompatActivity() {
             navGraph.setStartDestination(R.id.registerFragment)
         }
         navController.graph = navGraph
+
     }
+
 }
