@@ -9,9 +9,8 @@ import com.example.quickchat.databinding.ItemSearchBinding
 import com.example.quickchat.databinding.ItemUserBinding
 import com.example.quickchat.domain.model.UsersModel
 
-class MainChatPageAdapter(
-
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class MainChatPageAdapter()
+    : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var activeUserAdapter = ActiveUserAdapter()
     private var userList: List<UsersModel> = emptyList()

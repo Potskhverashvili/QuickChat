@@ -49,9 +49,7 @@ class FirebaseRepositoryImpl @Inject constructor(
             val userEmail = user?.email
             val userName = document?.getString("username")
             val userImage = null
-            val ragac = UsersModel(name = userName, userImage = userImage, userEmail = userEmail)
-            Log.d("MyLog", "$ragac")
-            ragac
+            UsersModel(name = userName, userImage = userImage, userEmail = userEmail)
         }
     }
 
