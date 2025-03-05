@@ -1,10 +1,10 @@
-package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.mainChatPage
+package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.mainChatPage.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.example.quickchat.databinding.ItemActiveUsersRvBinding
+import com.example.quickchat.databinding.ItemOnlineUsersRvBinding
 import com.example.quickchat.databinding.ItemSearchBinding
 import com.example.quickchat.databinding.ItemUserBinding
 import com.example.quickchat.domain.model.UsersModel
@@ -13,7 +13,7 @@ class MainChatPageAdapter(
 
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    var activeUserAdapter = ActiveUserAdapter()
+    var onlineUserAdapter = OnlineUserAdapter()
     private var userList: List<UsersModel> = emptyList()
 
     fun updateUsersList(newUsersList: List<UsersModel>) {
@@ -28,10 +28,10 @@ class MainChatPageAdapter(
     var onUserClick: () -> Unit = {}
 
 
-    inner class ActiveUsersViewHolder(private val binding: ItemActiveUsersRvBinding) :
+    inner class ActiveUsersViewHolder(private val binding: ItemOnlineUsersRvBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind() {
-            binding.activeUsersRecyclerView.adapter = activeUserAdapter
+            binding.onlineUsersRecyclerView.adapter = onlineUserAdapter
         }
     }
 
@@ -59,7 +59,7 @@ class MainChatPageAdapter(
         return when (viewType) {
 
             VIEW_TYPE_ACTIVE_USERS -> {
-                val binding = ItemActiveUsersRvBinding.inflate(
+                val binding = ItemOnlineUsersRvBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false

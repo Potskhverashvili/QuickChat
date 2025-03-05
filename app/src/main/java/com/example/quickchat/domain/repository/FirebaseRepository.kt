@@ -11,6 +11,8 @@ interface FirebaseRepository {
 
     suspend fun logInUser(email: String, password: String): OperationStatus<FirebaseUser>
 
-    suspend fun getUserProfileInfo():OperationStatus<UsersModel>
+    suspend fun getUserProfileInfo(): OperationStatus<UsersModel>
+
+    suspend fun getOnlineUsers(): OperationStatus<List<UsersModel>>
 
 }

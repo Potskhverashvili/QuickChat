@@ -1,26 +1,34 @@
 package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.mainChatPage
 
 import android.widget.Toast
+import androidx.fragment.app.viewModels
 import com.example.quickchat.core.BaseFragment
 import com.example.quickchat.databinding.FragmentMainChatPageBinding
-import com.example.quickchat.domain.model.ActiveUserModel
+import com.example.quickchat.domain.model.OnlineUserModel
 import com.example.quickchat.domain.model.UsersModel
+import com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.mainChatPage.adapters.MainChatPageAdapter
+import com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.mainChatPage.adapters.OnlineUserAdapter
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainChatPageFragment :
     BaseFragment<FragmentMainChatPageBinding>(FragmentMainChatPageBinding::inflate) {
 
-    private val activeUserAdapter = ActiveUserAdapter()
+    private val viewModel by viewModels<MainChatPageViewModel>()
+    private val onlineUserAdapter = OnlineUserAdapter()
     private var mainChatPageAdapter = MainChatPageAdapter()
 
     override fun viewCreated() {
         prepareRecyclerView()
         setListeners()
+        viewModel.getOnlineUsers()
     }
 
+
     private fun prepareRecyclerView() {
-        activeUserAdapter.submitList(activeUsersList)
+        onlineUserAdapter.submitList(activeUsersList)
         mainChatPageAdapter.updateUsersList(usersList)
-        mainChatPageAdapter.activeUserAdapter = activeUserAdapter
+        mainChatPageAdapter.onlineUserAdapter = onlineUserAdapter
         binding.mainChatPageRv.adapter = mainChatPageAdapter
     }
 
@@ -33,7 +41,7 @@ class MainChatPageFragment :
             Toast.makeText(requireContext(), "User clicked", Toast.LENGTH_SHORT).show()
         }
 
-        activeUserAdapter.onActiveUserClick = {
+        onlineUserAdapter.onActiveUserClick = {
             Toast.makeText(requireContext(), "ActiveUser clicked", Toast.LENGTH_SHORT).show()
         }
     }
@@ -45,7 +53,7 @@ class MainChatPageFragment :
     }
 
     private val activeUsersList = List(10) { index ->
-        ActiveUserModel(id = (index + 1).toString(), name = "Online User ${index + 1}")
+        OnlineUserModel(id = (index + 1).toString(), name = "Online User ${index + 1}")
     }
 
 }

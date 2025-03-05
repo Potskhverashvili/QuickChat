@@ -2,7 +2,7 @@ package com.example.quickchat.domain.model
 
 import java.util.UUID
 
-data class ActiveUserModel(
+data class OnlineUserModel(
     val id: String = UUID.randomUUID().toString(),
     val name: String
 )
