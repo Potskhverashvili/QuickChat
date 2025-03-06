@@ -10,7 +10,6 @@ import com.example.quickchat.domain.model.UsersModel
 
 class OnlineUserAdapter :
     ListAdapter<UsersModel, OnlineUserAdapter.OnlineUserViewHolder>(OnlineUserItemCallBack()) {
-
     var onActiveUserClick: () -> Unit = {}
 
     inner class OnlineUserViewHolder(private val binding: ItemOnlineUserBinding) :
