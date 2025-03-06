@@ -5,18 +5,41 @@
     android:layout_height="wrap_content"
     android:backgroundTint="@color/color_blue">
 
-
-    <androidx.appcompat.widget.AppCompatButton
+    <FrameLayout
         android:id="@+id/searchBtn"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="24dp"
-        android:text="Search"
-        android:textColor="@color/white"
-        android:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/background_search_white_with_corner"
+        android:padding="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginBottom="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
+        <!-- Search Icon aligned to the left -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="16dp"
+            android:scaleType="centerInside"
+            app:srcCompat="@drawable/ic_btn_search" />
+
+        <!-- Centered Text -->
+        <TextView
+            android:id="@+id/searchHint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Find connections near you..."
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+
+    </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

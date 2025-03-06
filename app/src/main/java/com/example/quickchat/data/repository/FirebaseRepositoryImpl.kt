@@ -2,6 +2,7 @@ package com.example.quickchat.data.repository
 
 import com.example.quickchat.core.FirebaseCallHelper
 import com.example.quickchat.core.OperationStatus
+import com.example.quickchat.domain.model.UserStatus
 import com.example.quickchat.domain.model.UsersModel
 import com.example.quickchat.domain.repository.FirebaseRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -18,7 +19,7 @@ class FirebaseRepositoryImpl @Inject constructor(
 ) : FirebaseRepository {
 
     override suspend fun registerNewUser(
-        username: String, email: String, password: String, status: String
+        username: String, email: String, password: String, status: UserStatus
     ): OperationStatus<FirebaseUser> {
         return FirebaseCallHelper.safeFirebaseCall {
             val authResult = auth.createUserWithEmailAndPassword(email, password).await()
@@ -27,12 +28,13 @@ class FirebaseRepositoryImpl @Inject constructor(
             val userMap = hashMapOf(
                 "username" to username,
                 "email" to email,
-                "status" to status
+                "status" to UserStatus.ONLINE
             )
             firestore.collection("users").document(user!!.uid).set(userMap).await()
             user
         }
     }
+
 
     override suspend fun logInUser(email: String, password: String): OperationStatus<FirebaseUser> {
         return FirebaseCallHelper.safeFirebaseCall {
@@ -66,7 +68,7 @@ class FirebaseRepositoryImpl @Inject constructor(
     override suspend fun getOnlineUsers(): OperationStatus<List<UsersModel>> {
         return FirebaseCallHelper.safeFirebaseCall {
             val querySnapshot =
-                firestore.collection("users").whereEqualTo("status", "online").get().await()
+                firestore.collection("users").whereEqualTo("status", UserStatus.ONLINE).get().await()
 
             val onlineUsers = querySnapshot.documents.mapNotNull { document ->
                 val userName = document.getString("username")
@@ -85,18 +87,39 @@ class FirebaseRepositoryImpl @Inject constructor(
         return FirebaseCallHelper.safeFirebaseCall {
 
             auth.currentUser?.uid?.let {
-                firestore.collection("users").document(it).update("status", "online")
+                firestore.collection("users").document(it).update("status", UserStatus.ONLINE)
             }
 
         }
     }
+
+    override suspend fun getSearchedUsers(query: String): OperationStatus<List<UsersModel>> {
+        return FirebaseCallHelper.safeFirebaseCall {
+            val snapshot = FirebaseFirestore.getInstance()
+                .collection("users")
+                .whereGreaterThanOrEqualTo("username", query.lowercase())
+                .whereLessThanOrEqualTo("username", query.lowercase() + "\uf8ff")
+                .get()
+                .await()
+
+            snapshot.documents.mapNotNull { document ->
+                UsersModel(
+                    id = document.id,
+                    name = document.getString("username"),
+                    userEmail = document.getString("email"),
+                    status = UserStatus.fromString(document.getString("status") ?: "OFFLINE")
+                )
+            }
+        }
+    }
+
 
     override suspend fun setUserStatusOffline(): OperationStatus<Unit> {
         return FirebaseCallHelper.safeFirebaseCall {
             val user = getCurrentUser()
 
             if (user is OperationStatus.Success) {
-                firestore.collection("users").document(user.value.uid).update("status", "offline")
+                firestore.collection("users").document(user.value.uid).update("status", UserStatus.OFFLINE)
             }
 
             /*user?.uid?.let {

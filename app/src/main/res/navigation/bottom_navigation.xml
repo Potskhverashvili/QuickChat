@@ -9,12 +9,22 @@
         android:id="@+id/chatFragment"
         android:name="com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.mainChatPage.MainChatPageFragment"
         android:label="ChatFragment"
-        tools:layout="@layout/fragment_main_chat_page"/>
+        tools:layout="@layout/fragment_main_chat_page">
+        <action
+            android:id="@+id/action_chatFragment_to_searchPageFragment"
+            app:destination="@id/searchPageFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.example.quickchat.presentation.screens.authorization.ContainerFragment.profile.ProfileFragment"
         android:label="ProfileFragment"
         tools:layout="@layout/fragment_profile"/>
+
+    <fragment
+        android:id="@+id/searchPageFragment"
+        android:name="com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.searchPage.SearchPageFragment"
+        android:label="fragment_search_page"
+        tools:layout="@layout/fragment_search_page" />
 
 </navigation>
