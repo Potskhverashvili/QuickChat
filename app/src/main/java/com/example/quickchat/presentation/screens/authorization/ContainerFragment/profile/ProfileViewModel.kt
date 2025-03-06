@@ -7,6 +7,7 @@ import com.example.quickchat.R
 import com.example.quickchat.core.OperationStatus
 import com.example.quickchat.domain.model.UsersModel
 import com.example.quickchat.domain.usecase.GetUserProfileUseCase
+import com.example.quickchat.domain.usecase.LogOutUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val getUserProfileUseCase: GetUserProfileUseCase
+    private val getUserProfileUseCase: GetUserProfileUseCase,
+    private val logOutUserUseCase: LogOutUserUseCase
 ) : ViewModel() {
 
     private val _profileItems = MutableStateFlow<List<ProfileItem>>(emptyList())
@@ -26,6 +28,23 @@ class ProfileViewModel @Inject constructor(
     init {
         getUserProfileUseCase()
         loadProfileItems()
+    }
+
+
+    fun logOutUser() = viewModelScope.launch{
+        when(val status = logOutUserUseCase.execute()){
+            is OperationStatus.Success -> {
+
+            }
+
+            is OperationStatus.Failure -> {
+
+            }
+
+            is OperationStatus.Loading -> {
+
+            }
+        }
     }
 
     private fun getUserProfileUseCase() = viewModelScope.launch {

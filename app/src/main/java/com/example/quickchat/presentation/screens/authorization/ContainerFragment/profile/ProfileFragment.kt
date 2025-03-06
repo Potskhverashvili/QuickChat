@@ -7,7 +7,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.quickchat.R
 import com.example.quickchat.core.BaseFragment
 import com.example.quickchat.databinding.FragmentProfileBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -61,8 +63,14 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
             .setTitle("Logout")
             .setMessage("Are you sure you want to log out?")
             .setPositiveButton("Yes") { _, _ ->
-                Toast.makeText(requireContext(),
-                    "Log Out", Toast.LENGTH_SHORT).show()
+
+                viewModel.logOutUser()
+                val navController = requireActivity().findNavController(R.id.fragmentContainerView)
+                navController.popBackStack(R.id.containerFragment, true)
+                navController.navigate(R.id.loginFragment)
+
+                /*Toast.makeText(requireContext(),
+                    "Log Out", Toast.LENGTH_SHORT).show()*/
             }
             .setNegativeButton("Cancel") { dialog, _ ->
                 dialog.dismiss()

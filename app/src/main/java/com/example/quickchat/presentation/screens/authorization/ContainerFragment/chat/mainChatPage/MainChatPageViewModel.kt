@@ -1,12 +1,12 @@
 package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.mainChatPage
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quickchat.core.OperationStatus
 import com.example.quickchat.domain.model.UsersModel
 import com.example.quickchat.domain.usecase.GetOnlineUsersUseCase
-import com.example.quickchat.domain.usecase.UserWentOfflineUseCase
+import com.example.quickchat.domain.usecase.SetUserStatusOfflineUseCase
+import com.example.quickchat.domain.usecase.SetUserStatusOnlineUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +16,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainChatPageViewModel @Inject constructor(
     private val getOnlineUsersUseCase: GetOnlineUsersUseCase,
-    private val userWentOfflineUseCase: UserWentOfflineUseCase
+    private val setUserStatusOfflineUseCase: SetUserStatusOfflineUseCase,
+    private val setUserStatusOnlineUseCase: SetUserStatusOnlineUseCase
 ) : ViewModel() {
 
     private val _onlineUsers = MutableStateFlow<List<UsersModel>>(emptyList())
@@ -25,8 +26,6 @@ class MainChatPageViewModel @Inject constructor(
     fun fetchOnlineUsers() = viewModelScope.launch {
         when (val result = getOnlineUsersUseCase.execute()) {
             is OperationStatus.Success -> {
-                Log.d("HEREMYLOG", "result => ${result.value}")
-                // Update the StateFlow with the list of online users
                 _onlineUsers.value = result.value
             }
 
@@ -40,11 +39,27 @@ class MainChatPageViewModel @Inject constructor(
         }
     }
 
-    fun userWentOffline() = viewModelScope.launch {
-        when (val result = userWentOfflineUseCase.execute()) {
+    fun setUserStatusOffline() = viewModelScope.launch {
+        when (val result = setUserStatusOfflineUseCase.execute()) {
             is OperationStatus.Success -> {
-                Log.d("HEREMYLOG", "result => ${result.value}")
-                fetchOnlineUsers()
+
+            }
+
+            is OperationStatus.Failure -> {
+                // Handle failure if necessary (e.g., show error message)
+            }
+
+            is OperationStatus.Loading -> {
+                // Optionally handle loading state
+            }
+        }
+
+    }
+
+    fun setUserStatusOnline() = viewModelScope.launch {
+        when (val result = setUserStatusOnlineUseCase.execute()) {
+            is OperationStatus.Success -> {
+
             }
 
             is OperationStatus.Failure -> {

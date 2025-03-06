@@ -62,5 +62,4 @@ class RegisterViewModel @Inject constructor(
             else -> true
         }
     }
-
 }

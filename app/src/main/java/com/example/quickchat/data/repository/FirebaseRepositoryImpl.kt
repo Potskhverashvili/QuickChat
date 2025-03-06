@@ -2,7 +2,6 @@ package com.example.quickchat.data.repository
 
 import com.example.quickchat.core.FirebaseCallHelper
 import com.example.quickchat.core.OperationStatus
-import com.example.quickchat.domain.model.UserStatus
 import com.example.quickchat.domain.model.UsersModel
 import com.example.quickchat.domain.repository.FirebaseRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -19,10 +18,7 @@ class FirebaseRepositoryImpl @Inject constructor(
 ) : FirebaseRepository {
 
     override suspend fun registerNewUser(
-        username: String,
-        email: String,
-        password: String,
-        status: String
+        username: String, email: String, password: String, status: String
     ): OperationStatus<FirebaseUser> {
         return FirebaseCallHelper.safeFirebaseCall {
             val authResult = auth.createUserWithEmailAndPassword(email, password).await()
@@ -42,10 +38,17 @@ class FirebaseRepositoryImpl @Inject constructor(
         return FirebaseCallHelper.safeFirebaseCall {
             val authResult = auth.signInWithEmailAndPassword(email, password).await()
             val user = authResult.user!!
+            setUserStatusOnline()
             user
         }
     }
 
+    override suspend fun logOutUser(): OperationStatus<Unit> {
+        return FirebaseCallHelper.safeFirebaseCall {
+            setUserStatusOffline()
+            auth.signOut()
+        }
+    }
 
     override suspend fun getUserProfileInfo(): OperationStatus<UsersModel> {
         return FirebaseCallHelper.safeFirebaseCall {
@@ -59,65 +62,52 @@ class FirebaseRepositoryImpl @Inject constructor(
         }
     }
 
-   /* override suspend fun getOnlineUsers(): OperationStatus<List<UsersModel>> {
-        return FirebaseCallHelper.safeFirebaseCall {
-            val db = FirebaseFirestore.getInstance()
-
-            val usersSnapshot = db.collection("users")
-                .whereEqualTo("status", UserStatus.OFFLINE.name) // Filter by online status
-                .get()
-                .await() // Suspend until Firestore returns the result
-
-            usersSnapshot.documents.mapNotNull { document ->
-
-                document.toObject(UsersModel::class.java)
-            }
-
-            *//*val user = doc.toObject(User::class.java)
-            user?.copy(uid = doc.id)*//*
-
-        }
-    }*/
 
     override suspend fun getOnlineUsers(): OperationStatus<List<UsersModel>> {
         return FirebaseCallHelper.safeFirebaseCall {
-            // Query Firestore for users whose status is "online"
-            val querySnapshot = firestore.collection("users")
-                .whereEqualTo("status", "online")
-                .get()
-                .await()
+            val querySnapshot =
+                firestore.collection("users").whereEqualTo("status", "online").get().await()
 
-            // Map the query snapshot to a list of UsersModel
             val onlineUsers = querySnapshot.documents.mapNotNull { document ->
                 val userName = document.getString("username")
                 val userEmail = document.getString("email")
-                // Assuming the user image is in the document
-
                 if (userName != null && userEmail != null) {
                     UsersModel(name = userName, userEmail = userEmail)
                 } else {
                     null
                 }
             }
-
             onlineUsers
         }
     }
 
-    override suspend fun userWentOffline(): OperationStatus<UsersModel> {
+    override suspend fun setUserStatusOnline(): OperationStatus<Unit> {
         return FirebaseCallHelper.safeFirebaseCall {
-            val user = auth.currentUser
-            // Get the user document by UID from Firestore
-            val userDocument =
-                user?.let { firestore.collection("users").document(user.uid).get().await() }
-                // Update the status to "offline"
-                firestore.collection("users").document(user!!.uid).update("status", "offline").await()
 
-                // Fetch the updated user information after updating the status
-                val updatedUser = userDocument?.toObject(UsersModel::class.java)
+            auth.currentUser?.uid?.let {
+                firestore.collection("users").document(it).update("status", "online")
+            }
 
-                // Return the updated user model
-                updatedUser ?: throw Exception("User data is null after update")
+        }
+    }
+
+    override suspend fun setUserStatusOffline(): OperationStatus<Unit> {
+        return FirebaseCallHelper.safeFirebaseCall {
+            val user = getCurrentUser()
+
+            if (user is OperationStatus.Success) {
+                firestore.collection("users").document(user.value.uid).update("status", "offline")
+            }
+
+            /*user?.uid?.let {
+                firestore.collection("users").document(it).update("status", "offline")
+            }*/
+        }
+    }
+
+    override suspend fun getCurrentUser(): OperationStatus<FirebaseUser> {
+        return FirebaseCallHelper.safeFirebaseCall {
+            auth.currentUser ?: throw Exception("User is not authenticated")
         }
     }
 }

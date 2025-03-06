@@ -11,10 +11,17 @@ interface FirebaseRepository {
 
     suspend fun logInUser(email: String, password: String): OperationStatus<FirebaseUser>
 
+    suspend fun logOutUser(): OperationStatus<Unit>
+
+    suspend fun getCurrentUser(): OperationStatus<FirebaseUser>
+
     suspend fun getUserProfileInfo(): OperationStatus<UsersModel>
 
     suspend fun getOnlineUsers(): OperationStatus<List<UsersModel>>
 
-    suspend fun userWentOffline(): OperationStatus<UsersModel>
+    suspend fun setUserStatusOffline(): OperationStatus<Unit>
+
+    suspend fun setUserStatusOnline(): OperationStatus<Unit>
+
 
 }

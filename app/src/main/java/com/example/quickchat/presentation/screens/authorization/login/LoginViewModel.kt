@@ -28,17 +28,14 @@ class LoginViewModel @Inject constructor(
     fun loginUser(email: String, password: String) = viewModelScope.launch {
         when (val result = loginUserUseCase.execute(email, password)) {
             is OperationStatus.Success -> {
-                d("MyLog", "Success")
                 _loginFlow.emit(result.value.email)
             }
 
             is OperationStatus.Failure -> {
-                d("MyLog", "Failure")
                 _showError.emit(result.exception.message)
             }
 
             is OperationStatus.Loading -> {
-                d("MyLog", "Progress")
                 _isLoadingState.emit(true)
             }
         }
@@ -51,7 +48,6 @@ class LoginViewModel @Inject constructor(
                 viewModelScope.launch { _showError.emit("Please fill in all fields") }
                 false
             }
-
             else -> true
         }
     }

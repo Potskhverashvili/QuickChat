@@ -6,17 +6,17 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quickchat.databinding.ItemOnlineUserBinding
-import com.example.quickchat.domain.model.OnlineUserModel
+import com.example.quickchat.domain.model.UsersModel
 
 class OnlineUserAdapter :
-    ListAdapter<OnlineUserModel, OnlineUserAdapter.OnlineUserViewHolder>(OnlineUserItemCallBack()) {
+    ListAdapter<UsersModel, OnlineUserAdapter.OnlineUserViewHolder>(OnlineUserItemCallBack()) {
 
     var onActiveUserClick: () -> Unit = {}
 
     inner class OnlineUserViewHolder(private val binding: ItemOnlineUserBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(onlineUser: OnlineUserModel) {
+        fun bind(onlineUser: UsersModel) {
             binding.activeUserTv.text = onlineUser.name
             binding.root.setOnClickListener {
                 onActiveUserClick.invoke()
@@ -37,11 +37,11 @@ class OnlineUserAdapter :
         holder.bind(getItem(position))
     }
 
-    private class OnlineUserItemCallBack : DiffUtil.ItemCallback<OnlineUserModel>() {
-        override fun areItemsTheSame(oldItem: OnlineUserModel, newItem: OnlineUserModel) =
+    private class OnlineUserItemCallBack : DiffUtil.ItemCallback<UsersModel>() {
+        override fun areItemsTheSame(oldItem: UsersModel, newItem: UsersModel) =
             oldItem.id == newItem.id
 
-        override fun areContentsTheSame(oldItem: OnlineUserModel, newItem: OnlineUserModel) =
+        override fun areContentsTheSame(oldItem: UsersModel, newItem: UsersModel) =
             oldItem == newItem
     }
 }
