@@ -59,7 +59,7 @@ class FirebaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getOnlineUsers(): OperationStatus<List<UsersModel>> {
+   /* override suspend fun getOnlineUsers(): OperationStatus<List<UsersModel>> {
         return FirebaseCallHelper.safeFirebaseCall {
             val db = FirebaseFirestore.getInstance()
 
@@ -73,11 +73,11 @@ class FirebaseRepositoryImpl @Inject constructor(
                 document.toObject(UsersModel::class.java)
             }
 
-            /*val user = doc.toObject(User::class.java)
-            user?.copy(uid = doc.id)*/
+            *//*val user = doc.toObject(User::class.java)
+            user?.copy(uid = doc.id)*//*
 
         }
-    }
+    }*/
 
     override suspend fun getOnlineUsers(): OperationStatus<List<UsersModel>> {
         return FirebaseCallHelper.safeFirebaseCall {
