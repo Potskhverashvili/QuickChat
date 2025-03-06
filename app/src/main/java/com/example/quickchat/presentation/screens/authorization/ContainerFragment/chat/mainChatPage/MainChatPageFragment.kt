@@ -1,6 +1,5 @@
 package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.mainChatPage
 
-import android.util.Log.d
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
