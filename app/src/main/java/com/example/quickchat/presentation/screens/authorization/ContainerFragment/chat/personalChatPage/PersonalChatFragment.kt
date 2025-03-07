@@ -12,7 +12,10 @@ import com.example.quickchat.core.BaseFragment
 import com.example.quickchat.databinding.FragmentPersonalChatBinding
 import com.example.quickchat.domain.model.MessageModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
@@ -41,31 +44,28 @@ class PersonalChatFragment :
 
         chatRef.get().addOnSuccessListener { snapshot ->
             if (!snapshot.exists()) {
-                // ✅ Create chat entry if it doesn't exist
                 val chatData = mapOf(
                     "chatId" to chatId,
                     "users" to listOf(currentUserUid, otherUserUid),
                     "createdAt" to System.currentTimeMillis()
                 )
-                chatRef.setValue(chatData).addOnSuccessListener {
-                    Log.d("Chat", "Chat created successfully!")
-                }.addOnFailureListener {
+                chatRef.setValue(chatData).addOnFailureListener {
                     Log.e("Chat", "Failed to create chat: ${it.message}")
                 }
             }
 
-            // ✅ Ensure `generalMessages` node exists inside the chat
             val generalMessagesRef = chatRef.child("generalMessages")
             generalMessagesRef.get().addOnSuccessListener { messagesSnapshot ->
                 if (!messagesSnapshot.exists()) {
-                    generalMessagesRef.setValue(emptyMap<String, Any>()).addOnSuccessListener {
-                        Log.d("Chat", "General messages node created!")
-                    }
+                    generalMessagesRef.setValue(emptyMap<String, Any>())
+                        .addOnSuccessListener { Log.d("Chat", "General messages node created!") }
                 }
             }
         }.addOnFailureListener {
             Log.e("Chat", "Error checking chat existence: ${it.message}")
         }
+
+        listenForMessages(chatId)
         setListeners()
     }
 
@@ -73,17 +73,16 @@ class PersonalChatFragment :
         return if (uid1 < uid2) "${uid1}_${uid2}" else "${uid2}_${uid1}"
     }
 
-
     private fun prepareRecyclerView() {
-        binding.messagesRecyclerView.apply {
-            adapter = personalAdapter
-            layoutManager =
-                LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        }
+        val layoutManager = LinearLayoutManager(requireContext())
+        layoutManager.stackFromEnd = true  // Makes sure the RecyclerView starts from the bottom
+
+        binding.messagesRecyclerView.layoutManager = layoutManager
+        binding.messagesRecyclerView.adapter = personalAdapter
     }
 
     private fun setListeners() = with(binding) {
-        binding.sendButton.setOnClickListener {
+        sendButton.setOnClickListener {
             sendMessage(
                 MessageModel(
                     id = UUID.randomUUID().toString(),
@@ -98,21 +97,47 @@ class PersonalChatFragment :
     private fun sendMessage(message: MessageModel) {
         val currentUserUid = curUser.uid ?: return
         val otherUserUid = args.userUid
-        val chatId = generateChatId(currentUserUid, otherUserUid) // Get the correct chatId
+        val chatId = generateChatId(currentUserUid, otherUserUid)
+        val chatRef = firebaseDatabase.child(chatId).child("generalMessages")
+        val currentUserEmail = FirebaseAuth.getInstance().currentUser?.email ?: return
 
-        val chatRef = firebaseDatabase.child(chatId).child("generalMessages") // Navigate to generalMessages
 
         val messageId = UUID.randomUUID().toString()
         val messageData = mapOf(
             "id" to messageId,
             "text" to message.text,
             "senderUid" to currentUserUid,
+            "senderEmail" to currentUserEmail,  // Save sender's email
             "timestamp" to System.currentTimeMillis()
         )
 
         chatRef.child(messageId).setValue(messageData)
-            .addOnSuccessListener { Log.d("Chat", "Message sent successfully!") }
+            .addOnSuccessListener {
+                Log.d("Chat", "Message sent successfully!")
+                binding.messagesRecyclerView.scrollToPosition(personalAdapter.itemCount - 1)
+            }
             .addOnFailureListener { Log.e("Chat", "Failed to send message: ${it.message}") }
     }
 
+    private fun listenForMessages(chatId: String) {
+        val chatRef = firebaseDatabase.child(chatId).child("generalMessages")
+
+        chatRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val messages = mutableListOf<MessageModel>()
+                for (messageSnapshot in snapshot.children) {
+                    val message = messageSnapshot.getValue(MessageModel::class.java)
+                    message?.let { messages.add(it) }
+                }
+                personalAdapter.setMessages(messages)
+
+                // Scroll to the last item after setting the messages
+                binding.messagesRecyclerView.scrollToPosition(messages.size - 1)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("Chat", "Failed to load messages: ${error.message}")
+            }
+        })
+    }
 }
