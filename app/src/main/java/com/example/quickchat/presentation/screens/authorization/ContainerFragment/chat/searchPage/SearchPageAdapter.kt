@@ -8,7 +8,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.quickchat.databinding.ItemSearchedPersonBinding
 import com.example.quickchat.domain.model.UsersModel
 
-class SearchPageAdapter : ListAdapter<UsersModel, SearchPageAdapter.SearchPageViewHolder>(SearchPageDiffUtil()) {
+class SearchPageAdapter :
+    ListAdapter<UsersModel, SearchPageAdapter.SearchPageViewHolder>(SearchPageDiffUtil()) {
+
+    var onSearchedUserClicked:(UsersModel)-> Unit = {}
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchPageViewHolder {
         return SearchPageViewHolder(
@@ -28,6 +31,9 @@ class SearchPageAdapter : ListAdapter<UsersModel, SearchPageAdapter.SearchPageVi
         RecyclerView.ViewHolder(binding.root) {
         fun bind(user: UsersModel) = with(binding) {
             searchedUserName.text = user.name
+            root.setOnClickListener {
+                onSearchedUserClicked.invoke(user)
+            }
         }
     }
 

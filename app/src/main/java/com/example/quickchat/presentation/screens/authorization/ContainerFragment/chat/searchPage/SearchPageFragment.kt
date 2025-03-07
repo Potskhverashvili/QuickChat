@@ -5,11 +5,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.quickchat.core.BaseFragment
 import com.example.quickchat.databinding.FragmentSearchPageBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -37,6 +37,10 @@ class SearchPageFragment :
         binding.btnSearch.doAfterTextChanged { newInputQuery ->
             viewModel.searchedMovieWithQuery(newInputQuery.toString())
         }
+
+        searchPageAdapter.onSearchedUserClicked = { user->
+            findNavController().navigate(SearchPageFragmentDirections.actionSearchPageFragmentToPersonalChatFragment(user.id))
+        }
     }
 
     private fun setCollectors() {
@@ -47,8 +51,5 @@ class SearchPageFragment :
                 }
             }
         }
-
-
     }
-
 }

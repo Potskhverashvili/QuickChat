@@ -23,7 +23,6 @@ class MainChatPageFragment :
     private val viewModel by viewModels<MainChatPageViewModel>()
 
     override fun viewCreated() {
-        //viewModel.setUserStatusOnline()
         prepareRecyclerView()
         fetchOnlineUsers()
         setListeners()

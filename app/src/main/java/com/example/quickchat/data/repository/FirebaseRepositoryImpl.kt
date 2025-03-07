@@ -1,5 +1,6 @@
 package com.example.quickchat.data.repository
 
+import android.util.Log.d
 import com.example.quickchat.core.FirebaseCallHelper
 import com.example.quickchat.core.OperationStatus
 import com.example.quickchat.domain.model.UserStatus
@@ -18,6 +19,7 @@ class FirebaseRepositoryImpl @Inject constructor(
     private val database: FirebaseDatabase
 ) : FirebaseRepository {
 
+    // ------------------------------------------- Auth ----------------------------------------
     override suspend fun registerNewUser(
         username: String, email: String, password: String, status: UserStatus
     ): OperationStatus<FirebaseUser> {
@@ -35,7 +37,6 @@ class FirebaseRepositoryImpl @Inject constructor(
         }
     }
 
-
     override suspend fun logInUser(email: String, password: String): OperationStatus<FirebaseUser> {
         return FirebaseCallHelper.safeFirebaseCall {
             val authResult = auth.signInWithEmailAndPassword(email, password).await()
@@ -52,6 +53,14 @@ class FirebaseRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getCurrentUser(): OperationStatus<FirebaseUser> {
+        return FirebaseCallHelper.safeFirebaseCall {
+            auth.currentUser ?: throw Exception("User is not authenticated")
+        }
+    }
+
+
+    // ----------------------------------------- User ----------------------------------
     override suspend fun getUserProfileInfo(): OperationStatus<UsersModel> {
         return FirebaseCallHelper.safeFirebaseCall {
             val user = auth.currentUser
@@ -68,7 +77,8 @@ class FirebaseRepositoryImpl @Inject constructor(
     override suspend fun getOnlineUsers(): OperationStatus<List<UsersModel>> {
         return FirebaseCallHelper.safeFirebaseCall {
             val querySnapshot =
-                firestore.collection("users").whereEqualTo("status", UserStatus.ONLINE).get().await()
+                firestore.collection("users").whereEqualTo("status", UserStatus.ONLINE).get()
+                    .await()
 
             val onlineUsers = querySnapshot.documents.mapNotNull { document ->
                 val userName = document.getString("username")
@@ -80,16 +90,6 @@ class FirebaseRepositoryImpl @Inject constructor(
                 }
             }
             onlineUsers
-        }
-    }
-
-    override suspend fun setUserStatusOnline(): OperationStatus<Unit> {
-        return FirebaseCallHelper.safeFirebaseCall {
-
-            auth.currentUser?.uid?.let {
-                firestore.collection("users").document(it).update("status", UserStatus.ONLINE)
-            }
-
         }
     }
 
@@ -113,26 +113,46 @@ class FirebaseRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getUserById(userId: String): OperationStatus<UsersModel> {
+        return FirebaseCallHelper.safeFirebaseCall {
+            val document = firestore.collection("users").document(userId).get().await()
+            val user = document.toObject(UsersModel::class.java) ?: throw Exception("User not found")
+
+            d("checkUserByID", "$user")
+            user
+        }
+    }
+
+
+    override suspend fun setUserStatusOnline(): OperationStatus<Unit> {
+        return FirebaseCallHelper.safeFirebaseCall {
+            val user = getCurrentUser()
+            if (user is OperationStatus.Success) {
+                firestore.collection("users").document(user.value.uid)
+                    .update("status", UserStatus.ONLINE)
+            }
+
+        }
+    }
 
     override suspend fun setUserStatusOffline(): OperationStatus<Unit> {
         return FirebaseCallHelper.safeFirebaseCall {
             val user = getCurrentUser()
-
             if (user is OperationStatus.Success) {
-                firestore.collection("users").document(user.value.uid).update("status", UserStatus.OFFLINE)
+                firestore.collection("users").document(user.value.uid)
+                    .update("status", UserStatus.OFFLINE)
             }
-
-            /*user?.uid?.let {
-                firestore.collection("users").document(it).update("status", "offline")
-            }*/
         }
     }
 
-    override suspend fun getCurrentUser(): OperationStatus<FirebaseUser> {
-        return FirebaseCallHelper.safeFirebaseCall {
-            auth.currentUser ?: throw Exception("User is not authenticated")
-        }
-    }
+
+
+
+
+    // -------------------------- Chat -----------------------
+
+
+
 }
 
 

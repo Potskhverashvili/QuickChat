@@ -54,7 +54,7 @@ class MainViewModel @Inject constructor(
 
 
     fun getCurrentUser(): Boolean {
-        var result: Boolean = false
+        var result = false
         viewModelScope.launch {
             when (val status = getCurrentUserUseCase.execute()) {
                 is OperationStatus.Success -> {
