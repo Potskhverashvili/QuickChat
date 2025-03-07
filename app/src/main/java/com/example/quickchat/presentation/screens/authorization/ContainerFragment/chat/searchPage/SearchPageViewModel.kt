@@ -46,7 +46,7 @@ class SearchPageViewModel @Inject constructor(
             when (val status = getSearchedUsers.execute(query)) {
                 is OperationStatus.Success -> {
                     val result = _searchMovieWithQuery.emit(status.value)
-                    Log.d("MYLOGING","result = $searchMovieWithQuery")
+                    Log.d("MYLOGING","result = ${searchMovieWithQuery.value}")
                 }
 
                 is OperationStatus.Failure -> {

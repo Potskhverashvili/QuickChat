@@ -13,10 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-
-
     private val viewModel by viewModels<MainViewModel>()
-   // val user = FirebaseAuth.getInstance()
 
     override fun onStart() {
         super.onStart()
@@ -26,7 +23,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // val user = FirebaseAuth.getInstance()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)

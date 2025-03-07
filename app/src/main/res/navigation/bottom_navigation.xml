@@ -25,6 +25,19 @@
         android:id="@+id/searchPageFragment"
         android:name="com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.searchPage.SearchPageFragment"
         android:label="fragment_search_page"
-        tools:layout="@layout/fragment_search_page" />
+        tools:layout="@layout/fragment_search_page" >
+        <action
+            android:id="@+id/action_searchPageFragment_to_personalChatFragment"
+            app:destination="@id/personalChatFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/personalChatFragment"
+        android:name="com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.personalChatPage.PersonalChatFragment"
+        android:label="PersonalChatFragment"
+        tools:layout="@layout/fragment_personal_chat">
+        <argument
+            android:name="userUid"
+            app:argType="string" />
+    </fragment>
 
 </navigation>
