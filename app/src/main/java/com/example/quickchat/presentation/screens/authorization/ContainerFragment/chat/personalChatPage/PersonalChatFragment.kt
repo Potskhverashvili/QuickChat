@@ -75,8 +75,7 @@ class PersonalChatFragment :
 
     private fun prepareRecyclerView() {
         val layoutManager = LinearLayoutManager(requireContext())
-        layoutManager.stackFromEnd = true  // Makes sure the RecyclerView starts from the bottom
-
+        layoutManager.stackFromEnd = true
         binding.messagesRecyclerView.layoutManager = layoutManager
         binding.messagesRecyclerView.adapter = personalAdapter
     }
@@ -129,7 +128,7 @@ class PersonalChatFragment :
                     val message = messageSnapshot.getValue(MessageModel::class.java)
                     message?.let { messages.add(it) }
                 }
-                personalAdapter.setMessages(messages)
+                personalAdapter.setMessages(messages.reversed())
 
                 // Scroll to the last item after setting the messages
                 binding.messagesRecyclerView.scrollToPosition(messages.size - 1)
@@ -140,4 +139,5 @@ class PersonalChatFragment :
             }
         })
     }
+
 }

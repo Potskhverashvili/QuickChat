@@ -145,13 +145,7 @@ class FirebaseRepositoryImpl @Inject constructor(
         }
     }
 
-
-
-
-
     // -------------------------- Chat -----------------------
-
-
 
 }
 
