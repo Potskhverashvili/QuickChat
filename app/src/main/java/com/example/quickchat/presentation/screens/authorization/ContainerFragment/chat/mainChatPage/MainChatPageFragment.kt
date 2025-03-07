@@ -65,8 +65,6 @@ class MainChatPageFragment :
         viewModel.fetchOnlineUsers()
     }
 
-
-
     // ----------------------------- List of Users -------------------------------------
     private val usersList = List(10) { index ->
         UsersModel(id = (index + 1).toString(), name = "User ${index + 1}")

@@ -22,10 +22,8 @@ class MainChatPageAdapter()
         diffResult.dispatchUpdatesTo(this)
     }
 
-
     var onSearchedClick: () -> Unit = {}
     var onUserClick: () -> Unit = {}
-
 
     inner class ActiveUsersViewHolder(private val binding: ItemOnlineUsersRvBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -52,7 +50,6 @@ class MainChatPageAdapter()
             }
         }
     }
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
