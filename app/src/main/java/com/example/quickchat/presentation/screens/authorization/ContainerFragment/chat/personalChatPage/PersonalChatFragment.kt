@@ -79,6 +79,19 @@ class PersonalChatFragment :
             }
         }
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.loadingState.collect { isLoading ->
+                    // Show a loading indicator or something else based on the loading state
+                    if (isLoading) {
+                        // Show loading state (e.g., a progress bar)
+                    } else {
+                        // Hide loading state
+                    }
+                }
+            }
+        }
+
     }
 
     private fun fetchMessages(chatId: String) {

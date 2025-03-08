@@ -30,6 +30,9 @@ class PersonalChatViewModel @Inject constructor(
     private val _messages = MutableStateFlow<List<MessageModel>>(emptyList())
     val messages: StateFlow<List<MessageModel>> = _messages.asStateFlow()
 
+    private val _loadingState = MutableStateFlow(false)
+    val loadingState: StateFlow<Boolean> = _loadingState.asStateFlow()
+
     fun createOrGetChatSession(currentUserUid: String, otherUserUid: String) =
         viewModelScope.launch {
             when (val status = createOrGetChatSession.execute(currentUserUid, otherUserUid)) {
@@ -63,6 +66,7 @@ class PersonalChatViewModel @Inject constructor(
 
 
     fun getMessages(chatId: String) = viewModelScope.launch {
+        _loadingState.emit(true) // Set loading state to true
         when (val status = retrieveAllMessages.execute(chatId)) {
             is OperationStatus.Success -> {
                 _messages.emit(status.value)
@@ -76,5 +80,6 @@ class PersonalChatViewModel @Inject constructor(
                 // Handle loading state
             }
         }
+        _loadingState.emit(false) // Set loading state to true
     }
 }

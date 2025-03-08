@@ -95,49 +95,29 @@ class ChatRepositoryImpl @Inject constructor(
                 .getInstance("https://quickchat-d765e-default-rtdb.europe-west1.firebasedatabase.app/")
                 .getReference("messages")
 
-            // Log the initialized reference path
-            Log.d(
-                "FirebaseDebug",
-                "Firebase Database initialized with path: ${firebaseDatabase.path}"
-            )
-
             val chatRef = firebaseDatabase.child(chatId).child("generalMessages")
-
-            // Log the reference path to ensure it's correct
-            Log.d("FirebaseDebug", "Fetching messages from: ${chatRef.path}")
 
             // Fetch all messages under 'generalMessages' node
             try {
                 val messagesSnapshot = chatRef.get().await()
 
-                // Log the number of messages retrieved
                 Log.d("FirebaseDebug", "Messages fetched: ${messagesSnapshot.childrenCount}")
 
                 // Convert Firebase data snapshot into a list of MessageModel objects
                 val messagesList = mutableListOf<MessageModel>()
                 for (snapshot in messagesSnapshot.children) {
-                    Log.d(
-                        "FirebaseDebug",
-                        "Snapshot key: ${snapshot.key}, value: ${snapshot.value}"
-                    )
                     val message = snapshot.getValue(MessageModel::class.java)
                     if (message != null) {
-                        // Log the message content
-                        Log.d("FirebaseDebug", "Message retrieved: ${message.text}")
                         messagesList.add(message)
                     } else {
-                        // Log when a message could not be parsed
                         Log.d("FirebaseDebug", "Message parsing failed")
                     }
                 }
 
-                // Log the final list of messages
-                Log.d("FirebaseDebug", "Total messages: ${messagesList.size}")
 
                 return@safeFirebaseCall messagesList
 
             } catch (e: Exception) {
-                // Log any errors during Firebase call
                 Log.e("FirebaseDebug", "Error fetching messages: ${e.message}")
                 return@safeFirebaseCall emptyList<MessageModel>()
             }
