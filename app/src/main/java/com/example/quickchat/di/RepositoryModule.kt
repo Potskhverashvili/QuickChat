@@ -1,6 +1,8 @@
 package com.example.quickchat.di
 
+import com.example.quickchat.data.repository.ChatRepositoryImpl
 import com.example.quickchat.data.repository.FirebaseRepositoryImpl
+import com.example.quickchat.domain.repository.ChatRepository
 import com.example.quickchat.domain.repository.FirebaseRepository
 import dagger.Binds
 import dagger.Module
@@ -20,5 +22,11 @@ abstract class RepositoryModule {
     abstract fun bindFirebaseRepository(
         impl: FirebaseRepositoryImpl
     ): FirebaseRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindChatRepository(
+        impl: ChatRepositoryImpl
+    ): ChatRepository
 
 }
