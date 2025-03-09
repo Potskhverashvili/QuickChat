@@ -24,9 +24,11 @@ class ChatRepositoryImpl @Inject constructor(
         otherUserUid: String
     ): OperationStatus<String> {
         return FirebaseCallHelper.safeFirebaseCall {
+            // Keep the hardcoded Firebase URL
             val firebaseDatabase = FirebaseDatabase
                 .getInstance("https://quickchat-d765e-default-rtdb.europe-west1.firebasedatabase.app/")
                 .getReference("messages")
+
             // Generate a unique chatId by sorting the user IDs alphabetically
             val chatId = listOf(currentUserUid, otherUserUid).sorted().joinToString("_")
 
@@ -35,16 +37,25 @@ class ChatRepositoryImpl @Inject constructor(
 
             // Check if the chat session exists
             val chatSnapshot = chatRef.get().await()
+            Log.d("ChatRepository", "Checking if chat exists for chatId: $chatId, exists: ${chatSnapshot.exists()}")
+
             if (!chatSnapshot.exists()) {
                 // If the chat doesn't exist, create a new one
                 val chatData = mapOf(
                     "chatId" to chatId,
                     "users" to listOf(currentUserUid, otherUserUid),
                     "createdAt" to System.currentTimeMillis(),
-                    "generalMessages" to mutableListOf<MessageModel>()
+                    "generalMessages" to mutableListOf<MessageModel>() // Initialize generalMessages as an empty list
                 )
+
                 // Set the value in the database
                 chatRef.setValue(chatData).await()
+
+                // Log that generalMessages is created
+                Log.d("ChatRepository", "New chat session created with generalMessages initialized for chatId: $chatId")
+            } else {
+                // Log that the chat session already exists
+                Log.d("ChatRepository", "Chat session already exists for chatId: $chatId")
             }
 
             // Return the chatId (either new or existing)
@@ -52,76 +63,59 @@ class ChatRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun sendMessage(
+
+    override suspend fun sendMessageAndGetAllMessages(
         chatId: String,
         senderEmail: String,
-        text: String,
-    ): OperationStatus<Unit> {
+        senderUid: String,
+        text: String
+    ): OperationStatus<List<MessageModel>> {
         return FirebaseCallHelper.safeFirebaseCall {
-            val messageId = System.currentTimeMillis().toString() // Create a unique message ID
-            val message = mapOf(
-                "id" to messageId,
-                "text" to text,
-                "senderEmail" to senderEmail,
-                "timestamp" to System.currentTimeMillis(),
-            )
-
+            // Initialize FirebaseDatabase with the specific URL
             val firebaseDatabase = FirebaseDatabase
                 .getInstance("https://quickchat-d765e-default-rtdb.europe-west1.firebasedatabase.app/")
                 .getReference("messages")
 
             val chatRef = firebaseDatabase.child(chatId)
 
-            // Check if the 'generalMessages' field exists, if not, initialize it
-            val chatSnapshot = chatRef.get().await()
-            if (!chatSnapshot.child("generalMessages").exists()) {
-                chatRef.child("generalMessages").setValue(mutableListOf<MessageModel>()).await()
+            // Generate a unique ID for the new message
+            val newMessageId = chatRef.child("generalMessages").push().key // Firebase generates a unique key here
+
+            // Prepare the new message to be added
+            val newMessage = MessageModel(
+                id = newMessageId,  // Set the generated ID
+                senderEmail = senderEmail,
+                text = text,
+                senderUid = senderUid,
+                timestamp = System.currentTimeMillis()
+            )
+
+            // Log the message being sent
+            Log.d("SendMessage", "Sending message: $newMessage")
+
+            // Send the message by adding it to the "generalMessages" list
+            newMessageId?.let {
+                chatRef.child("generalMessages").child(it).setValue(newMessage).await()
             }
 
-            // Add the message to the 'generalMessages' node
-            val messagesRef = chatRef.child("generalMessages").child(messageId)
-            messagesRef.setValue(message).await()
+            // Log the data after pushing to Firebase
+            Log.d("SendMessage", "Message sent successfully, fetching all messages.")
 
-            // Return the result
-            Unit
+            // Retrieve all messages
+            val messagesSnapshot = chatRef.child("generalMessages").get().await()
+            val messages = messagesSnapshot.children.mapNotNull {
+                it.getValue(MessageModel::class.java)
+            }
+
+            // Log the messages retrieved
+            Log.d("SendMessage", "Messages fetched: $messages")
+
+            messages
         }
     }
 
 
-    override suspend fun getMessages(chatId: String): OperationStatus<List<MessageModel>> {
-        return FirebaseCallHelper.safeFirebaseCall {
-            // Initialize the Firebase Database reference explicitly
-            val firebaseDatabase = FirebaseDatabase
-                .getInstance("https://quickchat-d765e-default-rtdb.europe-west1.firebasedatabase.app/")
-                .getReference("messages")
-
-            val chatRef = firebaseDatabase.child(chatId).child("generalMessages")
-
-            // Fetch all messages under 'generalMessages' node
-            try {
-                val messagesSnapshot = chatRef.get().await()
-
-                Log.d("FirebaseDebug", "Messages fetched: ${messagesSnapshot.childrenCount}")
-
-                // Convert Firebase data snapshot into a list of MessageModel objects
-                val messagesList = mutableListOf<MessageModel>()
-                for (snapshot in messagesSnapshot.children) {
-                    val message = snapshot.getValue(MessageModel::class.java)
-                    if (message != null) {
-                        messagesList.add(message)
-                    } else {
-                        Log.d("FirebaseDebug", "Message parsing failed")
-                    }
-                }
 
 
-                return@safeFirebaseCall messagesList
-
-            } catch (e: Exception) {
-                Log.e("FirebaseDebug", "Error fetching messages: ${e.message}")
-                return@safeFirebaseCall emptyList<MessageModel>()
-            }
-        }
-    }
 
 }

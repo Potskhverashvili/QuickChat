@@ -7,8 +7,7 @@ import com.example.quickchat.domain.model.MessageModel
 import com.example.quickchat.domain.model.UsersModel
 import com.example.quickchat.domain.usecase.CreateOrGetChatSession
 import com.example.quickchat.domain.usecase.GetUserByIdUseCase
-import com.example.quickchat.domain.usecase.RetrieveAllMessages
-import com.example.quickchat.domain.usecase.SendMessageUseCase
+import com.example.quickchat.domain.usecase.SendMessageAndGetAllMessages
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,8 +19,7 @@ import javax.inject.Inject
 class PersonalChatViewModel @Inject constructor(
     private val getUserByIdUseCase: GetUserByIdUseCase,
     private val createOrGetChatSession: CreateOrGetChatSession,
-    private val sendMessageUseCase: SendMessageUseCase,
-    private val retrieveAllMessages: RetrieveAllMessages
+    private val sendMessageAndGetAllMessages: SendMessageAndGetAllMessages
 ) : ViewModel() {
 
     private val _chatId = MutableStateFlow<String?>(null)
@@ -38,6 +36,7 @@ class PersonalChatViewModel @Inject constructor(
             when (val status = createOrGetChatSession.execute(currentUserUid, otherUserUid)) {
                 is OperationStatus.Success -> {
                     _chatId.emit(status.value)
+                    fetchMessages(status.value)  // Fetch messages immediately
                 }
 
                 is OperationStatus.Failure -> {}
@@ -45,41 +44,42 @@ class PersonalChatViewModel @Inject constructor(
             }
         }
 
-    fun startMessaging(chatId: String, senderEmail: String, text: String) {
-        viewModelScope.launch {
-            // Send the message using the repository
-            when (val status = sendMessageUseCase.execute(chatId, senderEmail, text)) {
-                is OperationStatus.Success -> {
-                    getMessages(chatId)
-                }
+    fun sendMessageAndGetAllMessages(
+        chatId: String,
+        senderEmail: String,
+        senderUid: String,
+        messageText: String
+    ) = viewModelScope.launch {
+        _loadingState.emit(true)
 
-                is OperationStatus.Failure -> {
-                    // Handle failure
-                }
-
-                is OperationStatus.Loading -> {
-                    // Handle loading state
-                }
-            }
-        }
-    }
-
-
-    fun getMessages(chatId: String) = viewModelScope.launch {
-        _loadingState.emit(true) // Set loading state to true
-        when (val status = retrieveAllMessages.execute(chatId)) {
+        when (val status =
+            sendMessageAndGetAllMessages.execute(chatId, senderEmail, senderUid, messageText)) {
             is OperationStatus.Success -> {
-                _messages.emit(status.value)
+                _messages.value += status.value // Append instead of replacing
             }
 
             is OperationStatus.Failure -> {
-                // Handle failure
+                // Handle error (e.g., show a Toast)
             }
 
-            is OperationStatus.Loading -> {
-                // Handle loading state
-            }
+            is OperationStatus.Loading -> {}
         }
-        _loadingState.emit(false) // Set loading state to true
+
+        _loadingState.emit(false)
     }
+
+    private fun fetchMessages(chatId: String) =
+        viewModelScope.launch {
+            _loadingState.emit(true)
+            when (val status = sendMessageAndGetAllMessages.execute(chatId, "", "", "")) {
+                is OperationStatus.Success -> {
+                    _messages.value = status.value // Ensure we update properly
+                }
+
+                is OperationStatus.Failure -> {}
+                is OperationStatus.Loading -> {}
+            }
+            _loadingState.emit(false)
+        }
+
 }

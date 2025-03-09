@@ -50,10 +50,13 @@ class PersonalChatFragment :
     private fun startMessaging() {
         val chatId = viewModel.chatId.value
         val senderEmail = curUser.currentUser?.email // Get the sender's email
+        val messageText = binding.messageEditText.text.toString()
+        val senderUid = curUser.uid
         if (chatId != null) {
-            val messageText = binding.messageEditText.text.toString()
             if (senderEmail != null) {
-                viewModel.startMessaging(chatId, senderEmail, messageText)
+                if (senderUid != null) {
+                    viewModel.sendMessageAndGetAllMessages(chatId, senderEmail, senderUid, messageText)
+                }
             }
         } else {
             Toast.makeText(requireContext(), "Chat not initialized yet.", Toast.LENGTH_SHORT).show()
@@ -65,7 +68,7 @@ class PersonalChatFragment :
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.chatId.collect { chatId ->
                     if (chatId != null) {
-                        fetchMessages(chatId)
+
                     }
                 }
             }
@@ -75,6 +78,9 @@ class PersonalChatFragment :
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.messages.collect { messages ->
                     personalAdapter.setMessages(messages)
+                    binding.messagesRecyclerView.post {
+                        binding.messagesRecyclerView.scrollToPosition(messages.size - 1)
+                    }
                 }
             }
         }
@@ -92,10 +98,6 @@ class PersonalChatFragment :
             }
         }
 
-    }
-
-    private fun fetchMessages(chatId: String) {
-        viewModel.getMessages(chatId)
     }
 
 }
