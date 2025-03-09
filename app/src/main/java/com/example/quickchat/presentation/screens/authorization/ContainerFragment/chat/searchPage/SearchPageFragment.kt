@@ -39,7 +39,7 @@ class SearchPageFragment :
         }
 
         searchPageAdapter.onSearchedUserClicked = { user->
-            findNavController().navigate(SearchPageFragmentDirections.actionSearchPageFragmentToPersonalChatFragment(user.id))
+            findNavController().navigate(SearchPageFragmentDirections.actionSearchPageFragmentToPersonalChatFragment(user.userEmail))
         }
     }
 

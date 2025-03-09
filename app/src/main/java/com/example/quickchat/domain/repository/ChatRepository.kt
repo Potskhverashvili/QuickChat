@@ -5,6 +5,8 @@ import com.example.quickchat.domain.model.MessageModel
 
 interface ChatRepository {
 
+    suspend fun getOrCreateChat(recipientEmail: String?): OperationStatus<String>
+
     suspend fun createOrGetChatSession(
         currentUserUid: String,
         otherUserUid: String

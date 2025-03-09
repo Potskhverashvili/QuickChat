@@ -36,8 +36,9 @@
         android:label="PersonalChatFragment"
         tools:layout="@layout/fragment_personal_chat">
         <argument
-            android:name="userUid"
-            app:argType="string" />
+            android:name="recipientEmail"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
 
 </navigation>

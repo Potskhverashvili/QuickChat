@@ -23,10 +23,15 @@ class PersonalChatFragment :
 
 
     override fun viewCreated() {
-        curUser.uid?.let { viewModel.createOrGetChatSession(it, args.userUid) }
+        //curUser.uid?.let { viewModel.createOrGetChatSession(it, args.userUid) }
+        getOrCreateChat()
         prepareRecyclerView()
         setListeners()
         setCollectors()
+    }
+
+    private fun getOrCreateChat() {
+        viewModel.getOrCreateChat(args.recipientEmail)
     }
 
     private fun prepareRecyclerView() {

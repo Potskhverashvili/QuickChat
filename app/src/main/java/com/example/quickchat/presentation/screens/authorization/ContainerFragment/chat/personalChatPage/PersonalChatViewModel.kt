@@ -1,11 +1,12 @@
 package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.personalChatPage
 
+import android.util.Log.d
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quickchat.core.OperationStatus
 import com.example.quickchat.domain.model.MessageModel
-import com.example.quickchat.domain.model.UsersModel
 import com.example.quickchat.domain.usecase.CreateOrGetChatSession
+import com.example.quickchat.domain.usecase.GetOrCreateChatUseCase
 import com.example.quickchat.domain.usecase.GetUserByIdUseCase
 import com.example.quickchat.domain.usecase.RetrieveAllMessages
 import com.example.quickchat.domain.usecase.SendMessageUseCase
@@ -19,6 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PersonalChatViewModel @Inject constructor(
     private val getUserByIdUseCase: GetUserByIdUseCase,
+    private val getOrCreateChatUseCase: GetOrCreateChatUseCase,
     private val createOrGetChatSession: CreateOrGetChatSession,
     private val sendMessageUseCase: SendMessageUseCase,
     private val retrieveAllMessages: RetrieveAllMessages
@@ -29,6 +31,18 @@ class PersonalChatViewModel @Inject constructor(
 
     private val _messages = MutableStateFlow<List<MessageModel>>(emptyList())
     val messages: StateFlow<List<MessageModel>> = _messages.asStateFlow()
+
+    fun getOrCreateChat(recipientEmail: String?) = viewModelScope.launch {
+
+        when (val status = getOrCreateChatUseCase.execute(recipientEmail)) {
+            is OperationStatus.Success -> {
+                d("CheckchatCreate", "Success")
+                _chatId.emit(status.value)
+            }
+            is OperationStatus.Failure -> {d("CheckchatCreate", "Fal")}
+            is OperationStatus.Loading -> {}
+        }
+    }
 
     fun createOrGetChatSession(currentUserUid: String, otherUserUid: String) =
         viewModelScope.launch {
