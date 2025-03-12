@@ -67,7 +67,6 @@ class PersonalChatFragment :
         }
     }
 
-
     private fun setCollectors() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -80,6 +79,5 @@ class PersonalChatFragment :
                 }
             }
         }
-
     }
 }
