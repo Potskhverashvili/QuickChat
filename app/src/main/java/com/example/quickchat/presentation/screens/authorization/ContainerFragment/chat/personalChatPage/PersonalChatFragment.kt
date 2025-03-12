@@ -32,7 +32,7 @@ class PersonalChatFragment :
     }
 
     private fun getOrCreateChat() {
-        viewModel.getOrCreateChat(args.recipientEmail)
+        viewModel.createOrGetChatSession(args.recipientEmail)
     }
 
     private fun prepareRecyclerView() {
