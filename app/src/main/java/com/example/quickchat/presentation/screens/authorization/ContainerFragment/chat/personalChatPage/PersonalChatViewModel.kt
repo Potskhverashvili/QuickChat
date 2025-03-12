@@ -1,18 +1,25 @@
 package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.personalChatPage
 
-import android.util.Log.d
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quickchat.core.OperationStatus
 import com.example.quickchat.domain.model.MessageModel
 import com.example.quickchat.domain.usecase.CreateOrGetChatSession
-import com.example.quickchat.domain.usecase.GetOrCreateChatUseCase
 import com.example.quickchat.domain.usecase.GetUserByIdUseCase
-import com.example.quickchat.domain.usecase.RetrieveAllMessages
-import com.example.quickchat.domain.usecase.SendMessageUseCase
+import com.example.quickchat.domain.usecase.ListenerForMessagesUseCase
+import com.example.quickchat.domain.usecase.SendMessage
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,35 +27,30 @@ import javax.inject.Inject
 @HiltViewModel
 class PersonalChatViewModel @Inject constructor(
     private val getUserByIdUseCase: GetUserByIdUseCase,
-    private val getOrCreateChatUseCase: GetOrCreateChatUseCase,
     private val createOrGetChatSession: CreateOrGetChatSession,
-    private val sendMessageUseCase: SendMessageUseCase,
-    private val retrieveAllMessages: RetrieveAllMessages
+    private val sendMessage: SendMessage,
+    private val listenerForMessagesUseCase: ListenerForMessagesUseCase
 ) : ViewModel() {
 
     private val _chatId = MutableStateFlow<String?>(null)
     val chatId: StateFlow<String?> = _chatId.asStateFlow()
 
-    private val _messages = MutableStateFlow<List<MessageModel>>(emptyList())
-    val messages: StateFlow<List<MessageModel>> = _messages.asStateFlow()
+    var id: String = chatId.toString()
 
-    fun getOrCreateChat(recipientEmail: String?) = viewModelScope.launch {
+    private val _messages = MutableSharedFlow<List<MessageModel>>()
+    val messages = _messages.asSharedFlow()
 
-        when (val status = getOrCreateChatUseCase.execute(recipientEmail)) {
-            is OperationStatus.Success -> {
-                d("CheckchatCreate", "Success")
-                _chatId.emit(status.value)
-            }
-            is OperationStatus.Failure -> {d("CheckchatCreate", "Fal")}
-            is OperationStatus.Loading -> {}
-        }
-    }
+    private val _loadingState = MutableStateFlow(false)
+    val loadingState: StateFlow<Boolean> = _loadingState.asStateFlow()
+
+    private val currentMessages = mutableListOf<MessageModel>()
 
     fun createOrGetChatSession(currentUserUid: String, otherUserUid: String) =
         viewModelScope.launch {
             when (val status = createOrGetChatSession.execute(currentUserUid, otherUserUid)) {
                 is OperationStatus.Success -> {
                     _chatId.emit(status.value)
+                    listenForMessages(status.value) // Set up listener when chat ID is available
                 }
 
                 is OperationStatus.Failure -> {}
@@ -56,39 +58,46 @@ class PersonalChatViewModel @Inject constructor(
             }
         }
 
-    fun startMessaging(chatId: String, senderEmail: String, text: String) {
-        viewModelScope.launch {
-            // Send the message using the repository
-            when (val status = sendMessageUseCase.execute(chatId, senderEmail, text)) {
-                is OperationStatus.Success -> {
-                    getMessages(chatId)
-                }
+    fun sendMessage(
+        chatId: String,
+        senderEmail: String,
+        senderUid: String,
+        messageText: String
+    ) = viewModelScope.launch {
+        _loadingState.emit(true)
+        sendMessage.execute(chatId, senderEmail, senderUid, messageText)
+        _loadingState.emit(false)
+    }
 
-                is OperationStatus.Failure -> {
-                    // Handle failure
-                }
-
-                is OperationStatus.Loading -> {
-                    // Handle loading state
-                }
+    private fun listenForMessages(chatId: String) = viewModelScope.launch {
+        listenerForMessagesUseCase.execute(chatId = chatId) { newMessage ->
+            viewModelScope.launch {
+                currentMessages.add(newMessage)
+                _messages.emit(currentMessages.toList()) // Emit updated message list
             }
         }
     }
 
-
-    fun getMessages(chatId: String) = viewModelScope.launch {
-        when (val status = retrieveAllMessages.execute(chatId)) {
-            is OperationStatus.Success -> {
-                _messages.emit(status.value)
-            }
-
-            is OperationStatus.Failure -> {
-                // Handle failure
-            }
-
-            is OperationStatus.Loading -> {
-                // Handle loading state
-            }
-        }
-    }
 }
+
+//    private fun listenForMessages(chatId: String) = viewModelScope.launch {
+//        Log.d("PersonalChatViewModel", "Calling listenerForMessagesUseCase.execute with chatId: $chatId")
+//        // Execute the use case
+//        when (val status = listenerForMessagesUseCase.execute(chatId)) {
+//            is OperationStatus.Success -> {
+//                val messagesList = status.value
+//                _messages.emit(messagesList)
+//                Log.d("PersonalChatViewModel", "Messages fetched: $messagesList")
+//            }
+//            is OperationStatus.Failure -> {
+//                Log.d("PersonalChatViewModel", "Failed to fetch messages: ${status.exception}")
+//            }
+//            is OperationStatus.Loading -> {
+//                Log.d("PersonalChatViewModel", "Loading messages...")
+//            }
+//        }
+//    }
+
+
+
+

@@ -1,5 +1,6 @@
 package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.personalChatPage
 
+import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -47,6 +48,7 @@ class PersonalChatFragment :
 
     private fun btnSentMessageClick() = with(binding) {
         sendButton.setOnClickListener {
+            Log.d("PersonalChatFragment", "Send button clicked!")
             startMessaging()
             messageEditText.text.clear()
         }
@@ -54,40 +56,35 @@ class PersonalChatFragment :
 
     private fun startMessaging() {
         val chatId = viewModel.chatId.value
-        val senderEmail = curUser.currentUser?.email // Get the sender's email
+        Log.d("PersonalChatFragment", "Starting messaging with chatId: $chatId")
+        val senderEmail = curUser.currentUser?.email
+        val messageText = binding.messageEditText.text.toString()
+        val senderUid = curUser.uid
+
         if (chatId != null) {
-            val messageText = binding.messageEditText.text.toString()
-            if (senderEmail != null) {
-                viewModel.startMessaging(chatId, senderEmail, messageText)
+            Log.d("PersonalChatFragment", "Chat ID is not null, sending message...")
+            if (senderEmail != null && senderUid != null) {
+                viewModel.sendMessage(chatId, senderEmail, senderUid, messageText)
             }
         } else {
+            Log.d("PersonalChatFragment", "Chat ID is null. Cannot start messaging.")
             Toast.makeText(requireContext(), "Chat not initialized yet.", Toast.LENGTH_SHORT).show()
         }
     }
 
+
     private fun setCollectors() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.chatId.collect { chatId ->
-                    if (chatId != null) {
-                        fetchMessages(chatId)
+                viewModel.messages.collect { messages ->
+                    Log.d("PersonalChatFragment", "Received new messages: $messages")
+                    personalAdapter.setMessages(messages)
+                    binding.messagesRecyclerView.post {
+                        binding.messagesRecyclerView.scrollToPosition(messages.size - 1)
                     }
                 }
             }
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.messages.collect { messages ->
-                    personalAdapter.setMessages(messages)
-                }
-            }
-        }
-
     }
-
-    private fun fetchMessages(chatId: String) {
-        viewModel.getMessages(chatId)
-    }
-
 }
