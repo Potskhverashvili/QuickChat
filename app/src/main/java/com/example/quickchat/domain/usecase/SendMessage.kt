@@ -6,7 +6,7 @@ import javax.inject.Inject
 class SendMessage @Inject constructor(
     private val chatRepository: ChatRepository
 ) {
-   /* suspend fun execute(
+    suspend fun execute(
         chatId: String,
         senderEmail: String,
         senderUid: String,
@@ -18,5 +18,5 @@ class SendMessage @Inject constructor(
             senderUid = senderUid,
             text = text
         )
-    }*/
+    }
 }

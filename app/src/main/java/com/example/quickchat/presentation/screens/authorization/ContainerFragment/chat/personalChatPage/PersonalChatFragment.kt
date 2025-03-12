@@ -69,7 +69,6 @@ class PersonalChatFragment :
 
 
     private fun setCollectors() {
-
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.messages.collect { messages ->
@@ -83,5 +82,4 @@ class PersonalChatFragment :
         }
 
     }
-
 }

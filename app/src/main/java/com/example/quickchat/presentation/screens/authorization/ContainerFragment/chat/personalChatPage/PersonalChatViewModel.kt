@@ -37,7 +37,7 @@ class PersonalChatViewModel @Inject constructor(
 
     var id: String = chatId.toString()
 
-    private val _messages = MutableSharedFlow<List<MessageModel>>(replay = 1)
+    private val _messages = MutableSharedFlow<List<MessageModel>>()
     val messages = _messages.asSharedFlow()
 
     private val _loadingState = MutableStateFlow(false)
