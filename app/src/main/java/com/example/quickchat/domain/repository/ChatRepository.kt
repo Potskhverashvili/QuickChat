@@ -10,11 +10,16 @@ interface ChatRepository {
         otherUserUid: String
     ): OperationStatus<String>
 
-
-    suspend fun sendMessageAndGetAllMessages(
+    suspend fun sendMessage(
         chatId: String,
         senderEmail: String,
         senderUid: String,
         text: String
-    ): OperationStatus<List<MessageModel>>
+    )
+
+    suspend fun listenForMessages(
+        chatId: String,
+        onMessageReceived: (MessageModel) -> Unit
+    )
+
 }

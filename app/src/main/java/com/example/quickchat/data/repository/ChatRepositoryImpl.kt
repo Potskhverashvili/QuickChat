@@ -6,8 +6,13 @@ import com.example.quickchat.core.OperationStatus
 import com.example.quickchat.domain.model.MessageModel
 import com.example.quickchat.domain.repository.ChatRepository
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -16,6 +21,7 @@ class ChatRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
     private var database: FirebaseDatabase
 ) : ChatRepository {
+    private var chatRef: DatabaseReference? = null
 
     // Reference to the "messages" node in the database
 
@@ -37,7 +43,10 @@ class ChatRepositoryImpl @Inject constructor(
 
             // Check if the chat session exists
             val chatSnapshot = chatRef.get().await()
-            Log.d("ChatRepository", "Checking if chat exists for chatId: $chatId, exists: ${chatSnapshot.exists()}")
+            Log.d(
+                "ChatRepository",
+                "Checking if chat exists for chatId: $chatId, exists: ${chatSnapshot.exists()}"
+            )
 
             if (!chatSnapshot.exists()) {
                 // If the chat doesn't exist, create a new one
@@ -52,7 +61,10 @@ class ChatRepositoryImpl @Inject constructor(
                 chatRef.setValue(chatData).await()
 
                 // Log that generalMessages is created
-                Log.d("ChatRepository", "New chat session created with generalMessages initialized for chatId: $chatId")
+                Log.d(
+                    "ChatRepository",
+                    "New chat session created with generalMessages initialized for chatId: $chatId"
+                )
             } else {
                 // Log that the chat session already exists
                 Log.d("ChatRepository", "Chat session already exists for chatId: $chatId")
@@ -64,58 +76,62 @@ class ChatRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun sendMessageAndGetAllMessages(
+    override suspend fun sendMessage(
         chatId: String,
         senderEmail: String,
         senderUid: String,
         text: String
-    ): OperationStatus<List<MessageModel>> {
-        return FirebaseCallHelper.safeFirebaseCall {
-            // Initialize FirebaseDatabase with the specific URL
+    ) {
+        FirebaseCallHelper.safeFirebaseCall {
             val firebaseDatabase = FirebaseDatabase
                 .getInstance("https://quickchat-d765e-default-rtdb.europe-west1.firebasedatabase.app/")
                 .getReference("messages")
 
             val chatRef = firebaseDatabase.child(chatId)
 
-            // Generate a unique ID for the new message
-            val newMessageId = chatRef.child("generalMessages").push().key // Firebase generates a unique key here
+            val newMessageId = chatRef.child("generalMessages").push().key
 
-            // Prepare the new message to be added
             val newMessage = MessageModel(
-                id = newMessageId,  // Set the generated ID
+                id = newMessageId,
                 senderEmail = senderEmail,
                 text = text,
                 senderUid = senderUid,
                 timestamp = System.currentTimeMillis()
             )
 
-            // Log the message being sent
             Log.d("SendMessage", "Sending message: $newMessage")
 
-            // Send the message by adding it to the "generalMessages" list
             newMessageId?.let {
                 chatRef.child("generalMessages").child(it).setValue(newMessage).await()
             }
 
-            // Log the data after pushing to Firebase
             Log.d("SendMessage", "Message sent successfully, fetching all messages.")
 
-            // Retrieve all messages
             val messagesSnapshot = chatRef.child("generalMessages").get().await()
-            val messages = messagesSnapshot.children.mapNotNull {
-                it.getValue(MessageModel::class.java)
-            }
 
-            // Log the messages retrieved
-            Log.d("SendMessage", "Messages fetched: $messages")
-
-            messages
+            Log.d("SendMessage", "Fetched messages: ${messagesSnapshot.children.count()}")
         }
     }
 
+    override suspend fun listenForMessages(chatId: String, onMessageReceived: (MessageModel) -> Unit) {
+        val firebaseDatabase = FirebaseDatabase
+            .getInstance("https://quickchat-d765e-default-rtdb.europe-west1.firebasedatabase.app/")
+        chatRef = firebaseDatabase.getReference("messages")
+            .child(chatId)
+            .child("generalMessages")
 
+        chatRef?.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                snapshot.getValue(MessageModel::class.java)?.let { message ->
+                    onMessageReceived(message) // Send message to use case
+                }
+            }
 
-
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) = Unit
+            override fun onChildRemoved(snapshot: DataSnapshot) = Unit
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) = Unit
+            override fun onCancelled(error: DatabaseError) = Unit
+        })
+    }
 
 }
