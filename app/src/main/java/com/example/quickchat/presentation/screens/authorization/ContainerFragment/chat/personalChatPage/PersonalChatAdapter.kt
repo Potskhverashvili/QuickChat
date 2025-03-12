@@ -78,5 +78,4 @@ class PersonalChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         const val SENT_MESSAGE_TYPE = 1
         const val RECEIVED_MESSAGE_TYPE = 2
     }
-
 }
