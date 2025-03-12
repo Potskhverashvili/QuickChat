@@ -42,26 +42,10 @@ class PersonalChatFragment :
 
     private fun btnSentMessageClick() = with(binding) {
         sendButton.setOnClickListener {
-            startMessaging()
             messageEditText.text.clear()
         }
     }
 
-    private fun startMessaging() {
-        val chatId = viewModel.chatId.value
-        val senderEmail = curUser.currentUser?.email // Get the sender's email
-        val messageText = binding.messageEditText.text.toString()
-        val senderUid = curUser.uid
-        if (chatId != null) {
-            if (senderEmail != null) {
-                if (senderUid != null) {
-                    viewModel.sendMessageAndGetAllMessages(chatId, senderEmail, senderUid, messageText)
-                }
-            }
-        } else {
-            Toast.makeText(requireContext(), "Chat not initialized yet.", Toast.LENGTH_SHORT).show()
-        }
-    }
 
     private fun setCollectors() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -85,18 +69,6 @@ class PersonalChatFragment :
             }
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.loadingState.collect { isLoading ->
-                    // Show a loading indicator or something else based on the loading state
-                    if (isLoading) {
-                        // Show loading state (e.g., a progress bar)
-                    } else {
-                        // Hide loading state
-                    }
-                }
-            }
-        }
 
     }
 

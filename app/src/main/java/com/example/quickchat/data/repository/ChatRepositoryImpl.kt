@@ -37,7 +37,10 @@ class ChatRepositoryImpl @Inject constructor(
 
             // Check if the chat session exists
             val chatSnapshot = chatRef.get().await()
-            Log.d("ChatRepository", "Checking if chat exists for chatId: $chatId, exists: ${chatSnapshot.exists()}")
+            Log.d(
+                "ChatRepository",
+                "Checking if chat exists for chatId: $chatId, exists: ${chatSnapshot.exists()}"
+            )
 
             if (!chatSnapshot.exists()) {
                 // If the chat doesn't exist, create a new one
@@ -52,7 +55,10 @@ class ChatRepositoryImpl @Inject constructor(
                 chatRef.setValue(chatData).await()
 
                 // Log that generalMessages is created
-                Log.d("ChatRepository", "New chat session created with generalMessages initialized for chatId: $chatId")
+                Log.d(
+                    "ChatRepository",
+                    "New chat session created with generalMessages initialized for chatId: $chatId"
+                )
             } else {
                 // Log that the chat session already exists
                 Log.d("ChatRepository", "Chat session already exists for chatId: $chatId")
@@ -62,60 +68,6 @@ class ChatRepositoryImpl @Inject constructor(
             chatId
         }
     }
-
-
-    override suspend fun sendMessageAndGetAllMessages(
-        chatId: String,
-        senderEmail: String,
-        senderUid: String,
-        text: String
-    ): OperationStatus<List<MessageModel>> {
-        return FirebaseCallHelper.safeFirebaseCall {
-            // Initialize FirebaseDatabase with the specific URL
-            val firebaseDatabase = FirebaseDatabase
-                .getInstance("https://quickchat-d765e-default-rtdb.europe-west1.firebasedatabase.app/")
-                .getReference("messages")
-
-            val chatRef = firebaseDatabase.child(chatId)
-
-            // Generate a unique ID for the new message
-            val newMessageId = chatRef.child("generalMessages").push().key // Firebase generates a unique key here
-
-            // Prepare the new message to be added
-            val newMessage = MessageModel(
-                id = newMessageId,  // Set the generated ID
-                senderEmail = senderEmail,
-                text = text,
-                senderUid = senderUid,
-                timestamp = System.currentTimeMillis()
-            )
-
-            // Log the message being sent
-            Log.d("SendMessage", "Sending message: $newMessage")
-
-            // Send the message by adding it to the "generalMessages" list
-            newMessageId?.let {
-                chatRef.child("generalMessages").child(it).setValue(newMessage).await()
-            }
-
-            // Log the data after pushing to Firebase
-            Log.d("SendMessage", "Message sent successfully, fetching all messages.")
-
-            // Retrieve all messages
-            val messagesSnapshot = chatRef.child("generalMessages").get().await()
-            val messages = messagesSnapshot.children.mapNotNull {
-                it.getValue(MessageModel::class.java)
-            }
-
-            // Log the messages retrieved
-            Log.d("SendMessage", "Messages fetched: $messages")
-
-            messages
-        }
-    }
-
-
-
 
 
 }

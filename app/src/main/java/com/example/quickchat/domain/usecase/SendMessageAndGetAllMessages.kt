@@ -8,7 +8,7 @@ import javax.inject.Inject
 class SendMessageAndGetAllMessages @Inject constructor(
     private val chatRepository: ChatRepository
 ) {
-    suspend fun execute(
+   /* suspend fun execute(
         chatId: String,
         senderEmail: String,
         senderUid: String,
@@ -20,5 +20,5 @@ class SendMessageAndGetAllMessages @Inject constructor(
             senderUid = senderUid,
             text = text
         )
-    }
+    }*/
 }
