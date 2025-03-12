@@ -1,11 +1,9 @@
 package com.example.quickchat.domain.usecase
 
-import com.example.quickchat.core.OperationStatus
-import com.example.quickchat.domain.model.MessageModel
 import com.example.quickchat.domain.repository.ChatRepository
 import javax.inject.Inject
 
-class SendMessageAndGetAllMessages @Inject constructor(
+class SendMessage @Inject constructor(
     private val chatRepository: ChatRepository
 ) {
    /* suspend fun execute(
@@ -13,8 +11,8 @@ class SendMessageAndGetAllMessages @Inject constructor(
         senderEmail: String,
         senderUid: String,
         text: String
-    ): OperationStatus<List<MessageModel>> {
-        return chatRepository.sendMessageAndGetAllMessages(
+    ) {
+        chatRepository.sendMessage(
             chatId = chatId,
             senderEmail = senderEmail,
             senderUid = senderUid,

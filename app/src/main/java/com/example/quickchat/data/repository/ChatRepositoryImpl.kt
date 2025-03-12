@@ -6,8 +6,13 @@ import com.example.quickchat.core.OperationStatus
 import com.example.quickchat.domain.model.MessageModel
 import com.example.quickchat.domain.repository.ChatRepository
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -16,6 +21,7 @@ class ChatRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
     private var database: FirebaseDatabase
 ) : ChatRepository {
+    private var chatRef: DatabaseReference? = null
 
     // Reference to the "messages" node in the database
 
@@ -69,5 +75,63 @@ class ChatRepositoryImpl @Inject constructor(
         }
     }
 
+
+    override suspend fun sendMessage(
+        chatId: String,
+        senderEmail: String,
+        senderUid: String,
+        text: String
+    ) {
+        FirebaseCallHelper.safeFirebaseCall {
+            val firebaseDatabase = FirebaseDatabase
+                .getInstance("https://quickchat-d765e-default-rtdb.europe-west1.firebasedatabase.app/")
+                .getReference("messages")
+
+            val chatRef = firebaseDatabase.child(chatId)
+
+            val newMessageId = chatRef.child("generalMessages").push().key
+
+            val newMessage = MessageModel(
+                id = newMessageId,
+                senderEmail = senderEmail,
+                text = text,
+                senderUid = senderUid,
+                timestamp = System.currentTimeMillis()
+            )
+
+            Log.d("SendMessage", "Sending message: $newMessage")
+
+            newMessageId?.let {
+                chatRef.child("generalMessages").child(it).setValue(newMessage).await()
+            }
+
+            Log.d("SendMessage", "Message sent successfully, fetching all messages.")
+
+            val messagesSnapshot = chatRef.child("generalMessages").get().await()
+
+            Log.d("SendMessage", "Fetched messages: ${messagesSnapshot.children.count()}")
+        }
+    }
+
+    override suspend fun listenForMessages(chatId: String, onMessageReceived: (MessageModel) -> Unit) {
+        val firebaseDatabase = FirebaseDatabase
+            .getInstance("https://quickchat-d765e-default-rtdb.europe-west1.firebasedatabase.app/")
+        chatRef = firebaseDatabase.getReference("messages")
+            .child(chatId)
+            .child("generalMessages")
+
+        chatRef?.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                snapshot.getValue(MessageModel::class.java)?.let { message ->
+                    onMessageReceived(message) // Send message to use case
+                }
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) = Unit
+            override fun onChildRemoved(snapshot: DataSnapshot) = Unit
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) = Unit
+            override fun onCancelled(error: DatabaseError) = Unit
+        })
+    }
 
 }
