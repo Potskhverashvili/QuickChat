@@ -53,7 +53,7 @@ class PersonalChatFragment :
         val chatId = viewModel.chatId.value
         Log.d("PersonalChatFragment", "Starting messaging with chatId: $chatId")
         val senderEmail = curUser.currentUser?.email
-        val messageText = binding.messageEditText.text.toString()
+        val messageText = binding.messageEditText.text.toString().trim()
         val senderUid = curUser.uid
 
         if (chatId != null) {

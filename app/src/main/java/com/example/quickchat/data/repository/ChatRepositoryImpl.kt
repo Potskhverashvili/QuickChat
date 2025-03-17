@@ -12,7 +12,10 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -40,14 +43,7 @@ class ChatRepositoryImpl @Inject constructor(
 
             // Reference to the chat in the "messages" collection using the generated chatId
             val chatRef = firebaseDatabase.child(chatId)
-
-            // Check if the chat session exists
             val chatSnapshot = chatRef.get().await()
-            Log.d(
-                "ChatRepository",
-                "Checking if chat exists for chatId: $chatId, exists: ${chatSnapshot.exists()}"
-            )
-
             if (!chatSnapshot.exists()) {
                 // If the chat doesn't exist, create a new one
                 val chatData = mapOf(
@@ -113,25 +109,35 @@ class ChatRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun listenForMessages(chatId: String, onMessageReceived: (MessageModel) -> Unit) {
+    override suspend fun listenForMessages(chatId: String): Flow<MessageModel> = callbackFlow {
         val firebaseDatabase = FirebaseDatabase
             .getInstance("https://quickchat-d765e-default-rtdb.europe-west1.firebasedatabase.app/")
         chatRef = firebaseDatabase.getReference("messages")
             .child(chatId)
             .child("generalMessages")
 
-        chatRef?.addChildEventListener(object : ChildEventListener {
+        val childEventListener  = object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 snapshot.getValue(MessageModel::class.java)?.let { message ->
-                    onMessageReceived(message) // Send message to use case
+                    trySend(message).isSuccess // Emit the message to Flow
                 }
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) = Unit
             override fun onChildRemoved(snapshot: DataSnapshot) = Unit
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) = Unit
-            override fun onCancelled(error: DatabaseError) = Unit
-        })
+            override fun onCancelled(error: DatabaseError) {
+                close(error.toException()) // Close flow in case of error
+            }
+        }
+
+        chatRef?.addChildEventListener(childEventListener)
+
+        // Remove listener when the flow is closed
+        awaitClose { chatRef?.removeEventListener(childEventListener) }
     }
+
+
+
 
 }
