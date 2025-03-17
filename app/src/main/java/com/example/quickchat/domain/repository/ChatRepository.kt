@@ -2,6 +2,7 @@ package com.example.quickchat.domain.repository
 
 import com.example.quickchat.core.OperationStatus
 import com.example.quickchat.domain.model.MessageModel
+import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
 
@@ -17,9 +18,10 @@ interface ChatRepository {
         text: String
     )
 
+
+
     suspend fun listenForMessages(
         chatId: String,
-        onMessageReceived: (MessageModel) -> Unit
-    )
+    ): Flow<MessageModel>
 
 }

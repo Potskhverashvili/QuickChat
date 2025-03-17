@@ -2,6 +2,7 @@ package com.example.quickchat.presentation.screens.authorization.ContainerFragme
 
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quickchat.databinding.ItemMessageReceivedBinding
@@ -52,24 +53,39 @@ class PersonalChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun getItemCount() = messages.size
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val message = messages[position]
+
+        val isLastFromSender = position == messages.size - 1 ||
+                messages[position].senderEmail != messages[position + 1].senderEmail
+
         when (holder) {
-            is SentMessageViewHolder -> holder.bind(messages[position])
-            is ReceivedMessageViewHolder -> holder.bind(messages[position])
+            is SentMessageViewHolder -> holder.bind(message)
+            is ReceivedMessageViewHolder -> holder.bind(message, isLastFromSender)
         }
     }
 
     class ReceivedMessageViewHolder(private val binding: ItemMessageReceivedBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(message: MessageModel) {
-            binding.emailTextView.text = message.senderEmail
+        fun bind(message: MessageModel, isLastFromSender: Boolean) {
             binding.messageTextView.text = message.text
+
+            if (isLastFromSender) {
+                binding.circularImageView.visibility = View.VISIBLE
+                // Load profile image using Glide or any other library
+//            Glide.with(binding.circularImageView.context)
+//                .load(message.senderProfileUrl)  // If available
+//                .placeholder(R.drawable.ic_profile_image_default)
+//                .into(binding.circularImageView)
+            } else {
+                binding.circularImageView.visibility = View.INVISIBLE
+            }
         }
     }
 
     class SentMessageViewHolder(private val binding: ItemMessageSentBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(message: MessageModel) {
-            binding.emailTextView.text = message.senderEmail
+//            binding.emailTextView.text = message.senderEmail
             binding.messageTextView.text = message.text
         }
     }

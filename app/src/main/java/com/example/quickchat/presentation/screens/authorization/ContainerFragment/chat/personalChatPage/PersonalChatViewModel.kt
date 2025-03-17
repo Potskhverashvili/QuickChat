@@ -1,7 +1,6 @@
 package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.personalChatPage
 
 import android.util.Log
-import android.util.Log.d
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quickchat.core.OperationStatus
@@ -36,8 +35,6 @@ class PersonalChatViewModel @Inject constructor(
     private val _chatId = MutableStateFlow<String?>(null)
     val chatId: StateFlow<String?> = _chatId.asStateFlow()
 
-    var id: String = chatId.toString()
-
     private val _messages = MutableSharedFlow<List<MessageModel>>()
     val messages = _messages.asSharedFlow()
 
@@ -51,7 +48,7 @@ class PersonalChatViewModel @Inject constructor(
             when (val status = createOrGetChatSession.execute(currentUserUid, otherUserUid)) {
                 is OperationStatus.Success -> {
                     _chatId.emit(status.value)
-                    listenForMessages(status.value) // Set up listener when chat ID is available
+                    listenForMessages(status.value)
                 }
 
                 is OperationStatus.Failure -> {}
@@ -71,37 +68,12 @@ class PersonalChatViewModel @Inject constructor(
     }
 
     private fun listenForMessages(chatId: String) = viewModelScope.launch {
-        d("listenerCheck", "ViewModel listenForMessages")
-        listenerForMessagesUseCase.execute(chatId = chatId) { newMessage ->
-            d("listenerCheck", "ViewcouModel Lambda newMessage\n")
-            d("listenerCheck", "\n")
-            viewModelScope.launch {
+        currentMessages.clear()
+        listenerForMessagesUseCase.execute(chatId)
+            .collect { newMessage ->
                 currentMessages.add(newMessage)
                 _messages.emit(currentMessages.toList()) // Emit updated message list
             }
-        }
     }
 
 }
-
-//    private fun listenForMessages(chatId: String) = viewModelScope.launch {
-//        Log.d("PersonalChatViewModel", "Calling listenerForMessagesUseCase.execute with chatId: $chatId")
-//        // Execute the use case
-//        when (val status = listenerForMessagesUseCase.execute(chatId)) {
-//            is OperationStatus.Success -> {
-//                val messagesList = status.value
-//                _messages.emit(messagesList)
-//                Log.d("PersonalChatViewModel", "Messages fetched: $messagesList")
-//            }
-//            is OperationStatus.Failure -> {
-//                Log.d("PersonalChatViewModel", "Failed to fetch messages: ${status.exception}")
-//            }
-//            is OperationStatus.Loading -> {
-//                Log.d("PersonalChatViewModel", "Loading messages...")
-//            }
-//        }
-//    }
-
-
-
-
