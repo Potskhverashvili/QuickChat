@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 class PersonalChatFragment :
     BaseFragment<FragmentPersonalChatBinding>(FragmentPersonalChatBinding::inflate) {
     private val args: PersonalChatFragmentArgs by navArgs()
-    private val viewModel by viewModels<PersonalChatViewModel>()
+    private val viewModel by viewModels<Pers>()
     private val curUser = FirebaseAuth.getInstance()
     private val personalAdapter = PersonalChatAdapter()
 

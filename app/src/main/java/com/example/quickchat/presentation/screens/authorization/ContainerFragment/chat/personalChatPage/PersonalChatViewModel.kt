@@ -1,6 +1,7 @@
 package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.personalChatPage
 
 import android.util.Log
+import android.util.Log.d
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quickchat.core.OperationStatus
@@ -70,7 +71,10 @@ class PersonalChatViewModel @Inject constructor(
     }
 
     private fun listenForMessages(chatId: String) = viewModelScope.launch {
+        d("listenerCheck", "ViewModel listenForMessages")
         listenerForMessagesUseCase.execute(chatId = chatId) { newMessage ->
+            d("listenerCheck", "ViewcouModel Lambda newMessage\n")
+            d("listenerCheck", "\n")
             viewModelScope.launch {
                 currentMessages.add(newMessage)
                 _messages.emit(currentMessages.toList()) // Emit updated message list

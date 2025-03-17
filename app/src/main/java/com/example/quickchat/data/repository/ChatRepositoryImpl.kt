@@ -1,6 +1,7 @@
 package com.example.quickchat.data.repository
 
 import android.util.Log
+import android.util.Log.d
 import com.example.quickchat.core.FirebaseCallHelper
 import com.example.quickchat.core.OperationStatus
 import com.example.quickchat.domain.model.MessageModel
@@ -114,6 +115,7 @@ class ChatRepositoryImpl @Inject constructor(
     }
 
     override suspend fun listenForMessages(chatId: String, onMessageReceived: (MessageModel) -> Unit) {
+        d("listenerCheck", "Repository listenForMessages")
         val firebaseDatabase = FirebaseDatabase
             .getInstance("https://quickchat-d765e-default-rtdb.europe-west1.firebasedatabase.app/")
         chatRef = firebaseDatabase.getReference("messages")
@@ -121,8 +123,11 @@ class ChatRepositoryImpl @Inject constructor(
             .child("generalMessages")
 
         chatRef?.addChildEventListener(object : ChildEventListener {
+
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                d("listenerCheck", "fun onChildAdded")
                 snapshot.getValue(MessageModel::class.java)?.let { message ->
+                    d("listenerCheck", "snapshot.getValueResult: -> $message ")
                     onMessageReceived(message) // Send message to use case
                 }
             }
