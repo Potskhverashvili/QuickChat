@@ -1,6 +1,7 @@
 package com.example.quickchat.data.repository
 
 import android.util.Log
+import android.util.Log.d
 import com.example.quickchat.core.FirebaseCallHelper
 import com.example.quickchat.core.OperationStatus
 import com.example.quickchat.domain.model.MessageModel
@@ -14,7 +15,6 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -110,13 +110,14 @@ class ChatRepositoryImpl @Inject constructor(
     }
 
     override suspend fun listenForMessages(chatId: String): Flow<MessageModel> = callbackFlow {
+
         val firebaseDatabase = FirebaseDatabase
             .getInstance("https://quickchat-d765e-default-rtdb.europe-west1.firebasedatabase.app/")
         chatRef = firebaseDatabase.getReference("messages")
             .child(chatId)
             .child("generalMessages")
 
-        val childEventListener  = object : ChildEventListener {
+        val childEventListener = object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 snapshot.getValue(MessageModel::class.java)?.let { message ->
                     trySend(message).isSuccess // Emit the message to Flow
@@ -131,13 +132,14 @@ class ChatRepositoryImpl @Inject constructor(
             }
         }
 
-        chatRef?.addChildEventListener(childEventListener)
+        val obser1 = chatRef?.addChildEventListener(childEventListener)
+        d("debaugChat", "obser1: $obser1")
 
         // Remove listener when the flow is closed
-        awaitClose { chatRef?.removeEventListener(childEventListener) }
+        awaitClose {
+            chatRef?.removeEventListener(childEventListener)
+            d("debaugChat", "remove listener")
+        }
+
     }
-
-
-
-
 }

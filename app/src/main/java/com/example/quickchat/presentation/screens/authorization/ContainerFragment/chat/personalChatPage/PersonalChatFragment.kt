@@ -1,6 +1,7 @@
 package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.personalChatPage
 
 import android.util.Log
+import android.util.Log.d
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -21,7 +22,6 @@ class PersonalChatFragment :
     private val viewModel by viewModels<PersonalChatViewModel>()
     private val curUser = FirebaseAuth.getInstance()
     private val personalAdapter = PersonalChatAdapter()
-
 
     override fun viewCreated() {
         curUser.uid?.let { viewModel.createOrGetChatSession(it, args.userUid) }
@@ -69,7 +69,6 @@ class PersonalChatFragment :
 
 
     private fun setCollectors() {
-
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.messages.collect { messages ->
@@ -83,5 +82,4 @@ class PersonalChatFragment :
         }
 
     }
-
 }

@@ -1,6 +1,6 @@
 package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.personalChatPage
 
-import android.util.Log
+import android.util.Log.d
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quickchat.core.OperationStatus
@@ -9,13 +9,7 @@ import com.example.quickchat.domain.usecase.CreateOrGetChatSession
 import com.example.quickchat.domain.usecase.GetUserByIdUseCase
 import com.example.quickchat.domain.usecase.ListenerForMessagesUseCase
 import com.example.quickchat.domain.usecase.SendMessage
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -74,6 +68,11 @@ class PersonalChatViewModel @Inject constructor(
                 currentMessages.add(newMessage)
                 _messages.emit(currentMessages.toList()) // Emit updated message list
             }
+    }
+
+    override fun onCleared() {
+        d("debaugChat", "onCleared")
+        super.onCleared()
     }
 
 }
