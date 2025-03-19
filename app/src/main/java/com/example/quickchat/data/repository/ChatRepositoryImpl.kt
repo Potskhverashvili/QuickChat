@@ -1,7 +1,6 @@
 package com.example.quickchat.data.repository
 
 import android.util.Log
-import android.util.Log.d
 import com.example.quickchat.core.FirebaseCallHelper
 import com.example.quickchat.core.OperationStatus
 import com.example.quickchat.domain.model.MessageModel
@@ -71,7 +70,6 @@ class ChatRepositoryImpl @Inject constructor(
         }
     }
 
-
     override suspend fun sendMessage(
         chatId: String,
         senderEmail: String,
@@ -132,14 +130,9 @@ class ChatRepositoryImpl @Inject constructor(
             }
         }
 
-        val obser1 = chatRef?.addChildEventListener(childEventListener)
-        d("debaugChat", "obser1: $obser1")
+        chatRef?.addChildEventListener(childEventListener)
 
         // Remove listener when the flow is closed
-        awaitClose {
-            chatRef?.removeEventListener(childEventListener)
-            d("debaugChat", "remove listener")
-        }
-
+        awaitClose { chatRef?.removeEventListener(childEventListener) }
     }
 }
