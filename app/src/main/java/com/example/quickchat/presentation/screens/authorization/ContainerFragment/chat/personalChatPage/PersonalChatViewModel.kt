@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quickchat.core.OperationStatus
 import com.example.quickchat.domain.model.MessageModel
+import com.example.quickchat.domain.model.UsersModel
 import com.example.quickchat.domain.usecase.CreateOrGetChatSession
 import com.example.quickchat.domain.usecase.GetUserByIdUseCase
 import com.example.quickchat.domain.usecase.ListenerForMessagesUseCase
@@ -36,6 +37,26 @@ class PersonalChatViewModel @Inject constructor(
     val loadingState: StateFlow<Boolean> = _loadingState.asStateFlow()
 
     private val currentMessages = mutableListOf<MessageModel>()
+
+    private var _userToMessageName = MutableSharedFlow<UsersModel>()
+    val userToMessageName = _userToMessageName.asSharedFlow()
+
+    fun getCurrentUserToMessage(id: String) = viewModelScope.launch {
+        when (val status = getUserByIdUseCase.execute(userId = id)) {
+            is OperationStatus.Success -> {
+                if (status.value.name.isNullOrEmpty()) {
+                    Log.e("PersonalChatViewModel", "User name is null or empty!")
+                }
+                _userToMessageName.emit(status.value)
+            }
+            is OperationStatus.Failure -> {
+                Log.e("PersonalChatViewModel", "Failed to get user: ${status.exception.message}")
+            }
+            is OperationStatus.Loading -> {
+                Log.d("PersonalChatViewModel", "Loading user data...")
+            }
+        }
+    }
 
     fun createOrGetChatSession(currentUserUid: String, otherUserUid: String) =
         viewModelScope.launch {

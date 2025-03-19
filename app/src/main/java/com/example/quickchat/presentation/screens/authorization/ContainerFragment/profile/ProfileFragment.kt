@@ -9,12 +9,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.quickchat.R
 import com.example.quickchat.core.BaseFragment
 import com.example.quickchat.databinding.FragmentProfileBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlin.coroutines.coroutineContext
 
 @AndroidEntryPoint
 class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBinding::inflate) {
@@ -39,7 +42,11 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
 
     private fun setListeners() = with(binding) {
         binding.btnBack.setOnClickListener {
+        }
 
+        profileAdapter.onProfileItemClick = {
+            Toast.makeText(requireContext(),
+                "profile was clicked", Toast.LENGTH_SHORT).show()
         }
 
         btnLogout.setOnClickListener {
@@ -48,11 +55,11 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
     }
 
     private fun setCollectors() {
-        viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch(Job()) {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.profileItems.collect { listOfItems ->
                     profileAdapter.submitList(listOfItems)
-                    Log.d("PROFILE","$listOfItems")
+                    Log.d("PROFILE", "$listOfItems")
                 }
             }
         }
@@ -70,8 +77,6 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
                 navController.popBackStack(R.id.containerFragment, true)
                 navController.navigate(R.id.loginFragment)
 
-                /*Toast.makeText(requireContext(),
-                    "Log Out", Toast.LENGTH_SHORT).show()*/
             }
             .setNegativeButton("Cancel") { dialog, _ ->
                 dialog.dismiss()

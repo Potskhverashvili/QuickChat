@@ -5,46 +5,112 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/userNameTv"
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/backBtn"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_margin="8dp"
+        android:contentDescription="Back"
+        android:src="@drawable/ic_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/userCircularImage"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="4dp"
+        android:src="@drawable/ic_profile_image_default"
+        app:civ_border_color="@color/gray"
+        app:civ_border_width="1dp"
+        app:layout_constraintBottom_toBottomOf="@id/backBtn"
+        app:layout_constraintStart_toEndOf="@id/backBtn"
+        app:layout_constraintTop_toTopOf="@id/backBtn" />
+
+    <LinearLayout
+        android:id="@+id/userInfoContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="USERNAME"
-        android:textSize="24dp"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginBottom="12dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/messagesRecyclerView"
+        app:layout_constraintEnd_toStartOf="@id/callBtn"
+        app:layout_constraintStart_toEndOf="@+id/backBtn"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/userNameTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="UserNameTest"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/userStatusTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Active 57 minutes ago"
+            android:textColor="@color/gray"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/callBtn"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:contentDescription="Call"
+        android:src="@drawable/ic_call"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/messagesRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@+id/messageEditText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/userNameTv"
+        app:layout_constraintTop_toBottomOf="@+id/userInfoContainer"
         app:reverseLayout="true" />
 
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/messageEditText"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/send_button"
+        android:hint="Type your message here"
+        android:imeOptions="actionSend"
+        android:inputType="textCapSentences|textMultiLine"
+        android:maxLines="3"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/gray"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/sendButton"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/sendButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical"
+        android:contentDescription="floating action button"
         android:src="@drawable/ic_send"
+        app:backgroundTint="@color/purple"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <EditText
-        android:id="@+id/messageEditText"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="8dp"
-        android:hint="Message"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/sendButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/sendButton" />
-
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="@color/white" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+

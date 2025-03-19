@@ -20,20 +20,21 @@ class ContainerFragment :
         val navHostFragment =
             childFragmentManager.findFragmentById(R.id.fragmentContainerView2) as? NavHostFragment
                 ?: return
-
         navController = navHostFragment.navController
         binding.bottomNavigationView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.personalChatFragment -> {
-                    binding.bottomNavigationView.visibility = View.GONE
+                    binding.bottomNavigationView.visibility = View.INVISIBLE
                 }
 
                 R.id.searchPageFragment -> {
-                    binding.bottomNavigationView.visibility = View.GONE
+                    binding.bottomNavigationView.visibility = View.INVISIBLE
                 }
+                else -> binding.bottomNavigationView.visibility = View.VISIBLE
             }
         }
     }
+
 }
