@@ -11,6 +11,8 @@ import com.example.quickchat.databinding.ItemProfileHeaderBinding
 
 class ProfileAdapter : ListAdapter<ProfileItem, RecyclerView.ViewHolder>(ProfileDiffCallback()) {
 
+    var onProfileItemClick: (profile: ProfileItem) -> Unit = {}
+
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position).type) {
             ProfileItemType.HEADER -> VIEW_TYPE_HEADER
@@ -54,6 +56,10 @@ class ProfileAdapter : ListAdapter<ProfileItem, RecyclerView.ViewHolder>(Profile
                 .into(userImage)
             userName.text = item.userName
             userEmail.text = item.userEmail
+
+            binding.btnProfileImageEdit.setOnClickListener {
+                onProfileItemClick.invoke(item)
+            }
         }
     }
 

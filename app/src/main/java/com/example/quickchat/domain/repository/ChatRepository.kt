@@ -18,8 +18,6 @@ interface ChatRepository {
         text: String
     )
 
-
-
     suspend fun listenForMessages(
         chatId: String,
     ): Flow<MessageModel>

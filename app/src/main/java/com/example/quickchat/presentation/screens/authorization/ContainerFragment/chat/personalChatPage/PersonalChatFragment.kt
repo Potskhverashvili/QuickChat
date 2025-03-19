@@ -1,7 +1,6 @@
 package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.personalChatPage
 
 import android.util.Log
-import android.util.Log.d
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -23,8 +22,10 @@ class PersonalChatFragment :
     private val curUser = FirebaseAuth.getInstance()
     private val personalAdapter = PersonalChatAdapter()
 
+
     override fun viewCreated() {
         curUser.uid?.let { viewModel.createOrGetChatSession(it, args.userUid) }
+        viewModel.getCurrentUserToMessage(args.userUid)
         prepareRecyclerView()
         setListeners()
         setCollectors()
@@ -45,7 +46,7 @@ class PersonalChatFragment :
         sendButton.setOnClickListener {
             Log.d("PersonalChatFragment", "Send button clicked!")
             startMessaging()
-            messageEditText.text.clear()
+            messageEditText.text?.clear()
         }
     }
 
@@ -69,6 +70,7 @@ class PersonalChatFragment :
 
 
     private fun setCollectors() {
+
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.messages.collect { messages ->
@@ -81,5 +83,14 @@ class PersonalChatFragment :
             }
         }
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.userToMessageName.collect { personToMessageName ->
+                    binding.userNameTv.text = personToMessageName.name.toString()
+                }
+            }
+        }
+
     }
+
 }

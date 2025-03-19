@@ -8,7 +8,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.fragment.NavHostFragment
 import com.example.quickchat.R
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -32,19 +31,18 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
-        val navController = navHostFragment.navController
-        val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
+        if (savedInstanceState == null) {
+            val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
+            val navController = navHostFragment.navController
+            val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
 
-        viewModel.setUserStatusOnline()
-        if (viewModel.getCurrentUser()) {
-            navGraph.setStartDestination(R.id.containerFragment)
-        } else {
-            navGraph.setStartDestination(R.id.registerFragment)
+            if (viewModel.getCurrentUser()) {
+                navGraph.setStartDestination(R.id.containerFragment)
+            } else {
+                navGraph.setStartDestination(R.id.registerFragment)
+            }
+            navController.graph = navGraph
         }
-        navController.graph = navGraph
-
     }
 
     override fun onStop() {
