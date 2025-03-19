@@ -52,7 +52,6 @@ class MainViewModel @Inject constructor(
 
     }
 
-
     fun getCurrentUser(): Boolean {
         var result = false
         viewModelScope.launch {
@@ -71,4 +70,5 @@ class MainViewModel @Inject constructor(
         }
         return result
     }
+
 }

@@ -129,7 +129,7 @@ class FirebaseRepositoryImpl @Inject constructor(
             val user = getCurrentUser()
             if (user is OperationStatus.Success) {
                 firestore.collection("users").document(user.value.uid)
-                    .update("status", UserStatus.ONLINE)
+                    .update("status", UserStatus.ONLINE).await()
             }
 
         }
@@ -140,12 +140,11 @@ class FirebaseRepositoryImpl @Inject constructor(
             val user = getCurrentUser()
             if (user is OperationStatus.Success) {
                 firestore.collection("users").document(user.value.uid)
-                    .update("status", UserStatus.OFFLINE)
+                    .update("status", UserStatus.OFFLINE).await()
+
             }
         }
     }
-
-    // -------------------------- Chat -----------------------
 
 }
 

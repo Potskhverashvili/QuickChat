@@ -16,7 +16,7 @@ class PersonalChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     fun setMessages(newMessages: List<MessageModel>) {
         messages = newMessages
-        notifyDataSetChanged()
+        notifyDataSetChanged() //TODO change with diffutill callback
     }
 
     // -------------------------------- Override Methods ----------------------------------

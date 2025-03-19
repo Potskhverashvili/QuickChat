@@ -33,6 +33,9 @@ class ContainerFragment :
                 R.id.searchPageFragment -> {
                     binding.bottomNavigationView.visibility = View.GONE
                 }
+                else -> {
+                    binding.bottomNavigationView.visibility = View.VISIBLE
+                }
             }
         }
     }

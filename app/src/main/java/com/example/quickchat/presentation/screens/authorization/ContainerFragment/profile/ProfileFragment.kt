@@ -70,8 +70,6 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
                 navController.popBackStack(R.id.containerFragment, true)
                 navController.navigate(R.id.loginFragment)
 
-                /*Toast.makeText(requireContext(),
-                    "Log Out", Toast.LENGTH_SHORT).show()*/
             }
             .setNegativeButton("Cancel") { dialog, _ ->
                 dialog.dismiss()
