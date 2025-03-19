@@ -7,7 +7,6 @@ import javax.inject.Inject
 class SetUserStatusOnlineUseCase @Inject constructor(
     private val firebaseRepository: FirebaseRepository
 ) {
-
     suspend fun execute(): OperationStatus<Unit> {
         return firebaseRepository.setUserStatusOnline()
     }

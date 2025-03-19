@@ -35,14 +35,10 @@ class RegisterViewModel @Inject constructor(
                 _showError.emit(status.exception.message)
                 _isLoadingState.emit(false)
             }
-
-            is OperationStatus.Loading -> {
-                _isLoadingState.emit(true)
-            }
         }
     }
 
-    fun isRegistrationValid(
+    fun areFieldsValid(
         username: String,
         email: String,
         password: String,

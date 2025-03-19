@@ -1,6 +1,5 @@
-package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.personalChatPage
+package com.example.quickchat.presentation.screens.containerFragment.chat.personalChatPage
 
-import android.util.Log.d
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quickchat.core.OperationStatus
@@ -9,7 +8,7 @@ import com.example.quickchat.domain.model.UsersModel
 import com.example.quickchat.domain.usecase.CreateOrGetChatSession
 import com.example.quickchat.domain.usecase.GetUserByIdUseCase
 import com.example.quickchat.domain.usecase.ListenerForMessagesUseCase
-import com.example.quickchat.domain.usecase.SendMessage
+import com.example.quickchat.domain.usecase.SendMessageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +22,7 @@ import javax.inject.Inject
 class PersonalChatViewModel @Inject constructor(
     private val getUserByIdUseCase: GetUserByIdUseCase,
     private val createOrGetChatSession: CreateOrGetChatSession,
-    private val sendMessage: SendMessage,
+    private val sendMessageUseCase: SendMessageUseCase,
     private val listenerForMessagesUseCase: ListenerForMessagesUseCase
 ) : ViewModel() {
 
@@ -38,23 +37,15 @@ class PersonalChatViewModel @Inject constructor(
 
     private val currentMessages = mutableListOf<MessageModel>()
 
-    private var _userToMessageName = MutableSharedFlow<UsersModel>()
-    val userToMessageName = _userToMessageName.asSharedFlow()
+    private var _receiverName = MutableSharedFlow<UsersModel>()
+    val receiverName = _receiverName.asSharedFlow()
 
-    fun getCurrentUserToMessage(id: String) = viewModelScope.launch {
+    private fun getReceiverUser(id: String) = viewModelScope.launch {
         when (val status = getUserByIdUseCase.execute(userId = id)) {
             is OperationStatus.Success -> {
-                if (status.value.name.isNullOrEmpty()) {
-                    Log.e("PersonalChatViewModel", "User name is null or empty!")
-                }
-                _userToMessageName.emit(status.value)
+                _receiverName.emit(status.value)
             }
-            is OperationStatus.Failure -> {
-                Log.e("PersonalChatViewModel", "Failed to get user: ${status.exception.message}")
-            }
-            is OperationStatus.Loading -> {
-                Log.d("PersonalChatViewModel", "Loading user data...")
-            }
+            is OperationStatus.Failure -> {}
         }
     }
 
@@ -62,12 +53,12 @@ class PersonalChatViewModel @Inject constructor(
         viewModelScope.launch {
             when (val status = createOrGetChatSession.execute(currentUserUid, otherUserUid)) {
                 is OperationStatus.Success -> {
+                    getReceiverUser(otherUserUid)
                     _chatId.emit(status.value)
                     listenForMessages(status.value)
                 }
 
                 is OperationStatus.Failure -> {}
-                is OperationStatus.Loading -> {}
             }
         }
 
@@ -78,7 +69,7 @@ class PersonalChatViewModel @Inject constructor(
         messageText: String
     ) = viewModelScope.launch {
         _loadingState.emit(true)
-        sendMessage.execute(chatId, senderEmail, senderUid, messageText)
+        sendMessageUseCase.execute(chatId, senderEmail, senderUid, messageText)
         _loadingState.emit(false)
     }
 
@@ -87,13 +78,7 @@ class PersonalChatViewModel @Inject constructor(
         listenerForMessagesUseCase.execute(chatId)
             .collect { newMessage ->
                 currentMessages.add(newMessage)
-                _messages.emit(currentMessages.toList()) // Emit updated message list
+                _messages.emit(currentMessages.toList())
             }
     }
-
-    override fun onCleared() {
-        d("debaugChat", "onCleared")
-        super.onCleared()
-    }
-
 }

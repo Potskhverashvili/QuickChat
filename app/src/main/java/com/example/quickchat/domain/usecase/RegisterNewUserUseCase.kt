@@ -8,11 +8,9 @@ import javax.inject.Inject
 class RegisterNewUserUseCase @Inject constructor(
     private val firebaseRepository: FirebaseRepository
 ) {
-
     suspend fun execute(
         username: String, email: String, password: String
     ): OperationStatus<FirebaseUser> {
         return firebaseRepository.registerNewUser(username, email, password)
     }
-
 }

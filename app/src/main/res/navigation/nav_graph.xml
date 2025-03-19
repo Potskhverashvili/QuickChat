@@ -49,7 +49,7 @@
 
     <fragment
         android:id="@+id/containerFragment"
-        android:name="com.example.quickchat.presentation.screens.authorization.ContainerFragment.ContainerFragment"
+        android:name="com.example.quickchat.presentation.screens.containerFragment.ContainerFragment"
         android:label="ContainerFragment"
         tools:layout="@layout/fragment_container"/>
 

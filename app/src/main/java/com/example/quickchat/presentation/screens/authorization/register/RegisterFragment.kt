@@ -11,7 +11,6 @@ import com.example.quickchat.core.BaseFragment
 import com.example.quickchat.databinding.FragmentRegisterBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @AndroidEntryPoint
 class RegisterFragment : BaseFragment<FragmentRegisterBinding>(FragmentRegisterBinding::inflate) {
@@ -28,7 +27,7 @@ class RegisterFragment : BaseFragment<FragmentRegisterBinding>(FragmentRegisterB
             val email = binding.emailEditText.text.toString()
             val password = binding.passwordEditText.text.toString()
             val repeatPassword = binding.repeatPasswordEditText.text.toString()
-            val isValid = viewModel.isRegistrationValid(userName, email, password, repeatPassword)
+            val isValid = viewModel.areFieldsValid(userName, email, password, repeatPassword)
             if (isValid) {
                 viewModel.registerNewUser(userName, email, password)
             }
@@ -37,12 +36,10 @@ class RegisterFragment : BaseFragment<FragmentRegisterBinding>(FragmentRegisterB
         binding.loginBtn.setOnClickListener {
             goToLogInPage()
         }
-
     }
 
 
     private fun setCollectors() {
-
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.registerFlow.collect {
@@ -72,5 +69,4 @@ class RegisterFragment : BaseFragment<FragmentRegisterBinding>(FragmentRegisterB
     private fun goToLogInPage() {
         findNavController().navigate(RegisterFragmentDirections.actionRegisterFragmentToLoginFragment())
     }
-
 }

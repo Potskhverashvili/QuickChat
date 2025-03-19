@@ -1,4 +1,4 @@
-package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.personalChatPage
+package com.example.quickchat.presentation.screens.containerFragment.chat.personalChatPage
 
 
 import android.view.LayoutInflater
@@ -11,7 +11,6 @@ import com.example.quickchat.domain.model.MessageModel
 import com.google.firebase.auth.FirebaseAuth
 
 class PersonalChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
     private var messages = emptyList<MessageModel>()
 
     fun setMessages(newMessages: List<MessageModel>) {
@@ -71,7 +70,8 @@ class PersonalChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
             if (isLastFromSender) {
                 binding.circularImageView.visibility = View.VISIBLE
-                // Load profile image using Glide or any other library
+
+                //TODO Load profile image using Glide or any other library
 //            Glide.with(binding.circularImageView.context)
 //                .load(message.senderProfileUrl)  // If available
 //                .placeholder(R.drawable.ic_profile_image_default)
@@ -94,5 +94,4 @@ class PersonalChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         const val SENT_MESSAGE_TYPE = 1
         const val RECEIVED_MESSAGE_TYPE = 2
     }
-
 }

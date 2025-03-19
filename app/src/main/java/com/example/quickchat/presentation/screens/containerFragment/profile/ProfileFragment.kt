@@ -1,7 +1,6 @@
-package com.example.quickchat.presentation.screens.authorization.ContainerFragment.profile
+package com.example.quickchat.presentation.screens.containerFragment.profile
 
 import android.util.Log
-import android.util.Log.d
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
@@ -9,7 +8,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.quickchat.R
 import com.example.quickchat.core.BaseFragment
@@ -17,7 +15,6 @@ import com.example.quickchat.databinding.FragmentProfileBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlin.coroutines.coroutineContext
 
 @AndroidEntryPoint
 class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBinding::inflate) {
@@ -59,7 +56,6 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.profileItems.collect { listOfItems ->
                     profileAdapter.submitList(listOfItems)
-                    Log.d("PROFILE", "$listOfItems")
                 }
             }
         }
@@ -83,5 +79,4 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
             }
             .show()
     }
-
 }

@@ -10,7 +10,6 @@ class GetOnlineUsersUseCase @Inject constructor(
     private val repository: FirebaseRepository
 ) {
     suspend fun execute(): OperationStatus<List<UsersModel>> {
-        Log.d("HEREMYLOG", "GetOnlineUsersUseCase.execute() started")
         return repository.getOnlineUsers()
     }
 }

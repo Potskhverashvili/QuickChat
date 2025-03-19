@@ -1,4 +1,4 @@
-package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.mainChatPage
+package com.example.quickchat.presentation.screens.containerFragment.chat.mainChatPage
 
 import android.widget.Toast
 import androidx.fragment.app.viewModels
@@ -9,8 +9,8 @@ import androidx.navigation.fragment.findNavController
 import com.example.quickchat.core.BaseFragment
 import com.example.quickchat.databinding.FragmentMainChatPageBinding
 import com.example.quickchat.domain.model.UsersModel
-import com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.mainChatPage.adapters.MainChatPageAdapter
-import com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.mainChatPage.adapters.OnlineUserAdapter
+import com.example.quickchat.presentation.screens.containerFragment.chat.mainChatPage.adapters.MainChatPageAdapter
+import com.example.quickchat.presentation.screens.containerFragment.chat.mainChatPage.adapters.OnlineUserAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

@@ -34,13 +34,8 @@ class LoginViewModel @Inject constructor(
             is OperationStatus.Failure -> {
                 _showError.emit(result.exception.message)
             }
-
-            is OperationStatus.Loading -> {
-                _isLoadingState.emit(true)
-            }
         }
     }
-
 
     fun areFieldsValid(email: String, password: String): Boolean {
         return when {
@@ -48,6 +43,7 @@ class LoginViewModel @Inject constructor(
                 viewModelScope.launch { _showError.emit("Please fill in all fields") }
                 false
             }
+
             else -> true
         }
     }

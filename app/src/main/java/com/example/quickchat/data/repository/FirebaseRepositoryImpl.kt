@@ -1,7 +1,5 @@
 package com.example.quickchat.data.repository
 
-import android.util.Log
-import android.util.Log.d
 import com.example.quickchat.core.FirebaseCallHelper
 import com.example.quickchat.core.OperationStatus
 import com.example.quickchat.domain.model.UserStatus
@@ -17,10 +15,9 @@ import javax.inject.Inject
 class FirebaseRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
-    private val database: FirebaseDatabase
+    private val database: FirebaseDatabase //TODO use or delete
 ) : FirebaseRepository {
 
-    // ------------------------------------------- Auth ----------------------------------------
     override suspend fun registerNewUser(
         username: String, email: String, password: String, status: UserStatus
     ): OperationStatus<FirebaseUser> {
@@ -60,8 +57,6 @@ class FirebaseRepositoryImpl @Inject constructor(
         }
     }
 
-
-    // ----------------------------------------- User ----------------------------------
     override suspend fun getUserProfileInfo(): OperationStatus<UsersModel> {
         return FirebaseCallHelper.safeFirebaseCall {
             val user = auth.currentUser
@@ -73,7 +68,6 @@ class FirebaseRepositoryImpl @Inject constructor(
             UsersModel(name = userName, userImage = userImage, userEmail = userEmail)
         }
     }
-
 
     override suspend fun getOnlineUsers(): OperationStatus<List<UsersModel>> {
         return FirebaseCallHelper.safeFirebaseCall {
@@ -120,19 +114,14 @@ class FirebaseRepositoryImpl @Inject constructor(
             if (!document.exists()) {
                 throw Exception("User not found")
             }
-            // Log the raw document data for debugging
-            Log.d("checkUserByID", "Raw document data: ${document.data}")
 
-            // Extract data from the Firestore document
             val name = document.getString("username")
             val userImage = document.getLong("userImage")?.toInt()
             val userEmail = document.getString("email")
             val statusString = document.getString("status")
 
-            // Convert status to enum
             val status = statusString?.let { UserStatus.valueOf(it) } ?: UserStatus.OFFLINE
 
-            // Create UsersModel instance
             val user = UsersModel(
                 id = userId,
                 name = name,
@@ -143,7 +132,6 @@ class FirebaseRepositoryImpl @Inject constructor(
             user
         }
     }
-
 
     override suspend fun setUserStatusOnline(): OperationStatus<Unit> {
         return FirebaseCallHelper.safeFirebaseCall {
@@ -156,7 +144,7 @@ class FirebaseRepositoryImpl @Inject constructor(
                         docRef,
                         "lastUpdated",
                         System.currentTimeMillis()
-                    ) // Ensure immediate update
+                    )
                 }.await()
             }
         }
@@ -173,12 +161,11 @@ class FirebaseRepositoryImpl @Inject constructor(
                         docRef,
                         "lastUpdated",
                         System.currentTimeMillis()
-                    ) // Force sync
+                    )
                 }.await()
             }
         }
     }
-
 }
 
 

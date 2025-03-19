@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/chatFragment"
-        android:name="com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.mainChatPage.MainChatPageFragment"
+        android:name="com.example.quickchat.presentation.screens.containerFragment.chat.mainChatPage.MainChatPageFragment"
         android:label="ChatFragment"
         tools:layout="@layout/fragment_main_chat_page">
         <action
@@ -17,13 +17,13 @@
 
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.example.quickchat.presentation.screens.authorization.ContainerFragment.profile.ProfileFragment"
+        android:name="com.example.quickchat.presentation.screens.containerFragment.profile.ProfileFragment"
         android:label="ProfileFragment"
         tools:layout="@layout/fragment_profile"/>
 
     <fragment
         android:id="@+id/searchPageFragment"
-        android:name="com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.searchPage.SearchPageFragment"
+        android:name="com.example.quickchat.presentation.screens.containerFragment.chat.searchPage.SearchPageFragment"
         android:label="fragment_search_page"
         tools:layout="@layout/fragment_search_page" >
         <action
@@ -32,11 +32,11 @@
     </fragment>
     <fragment
         android:id="@+id/personalChatFragment"
-        android:name="com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.personalChatPage.PersonalChatFragment"
+        android:name="com.example.quickchat.presentation.screens.containerFragment.chat.personalChatPage.PersonalChatFragment"
         android:label="PersonalChatFragment"
         tools:layout="@layout/fragment_personal_chat">
         <argument
-            android:name="userUid"
+            android:name="receiverUid"
             app:argType="string" />
     </fragment>
 

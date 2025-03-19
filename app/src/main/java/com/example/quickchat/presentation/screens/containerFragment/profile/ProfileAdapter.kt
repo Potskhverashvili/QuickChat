@@ -1,4 +1,4 @@
-package com.example.quickchat.presentation.screens.authorization.ContainerFragment.profile
+package com.example.quickchat.presentation.screens.containerFragment.profile
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

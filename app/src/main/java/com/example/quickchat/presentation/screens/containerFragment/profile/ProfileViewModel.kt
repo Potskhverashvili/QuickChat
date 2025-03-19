@@ -1,4 +1,4 @@
-package com.example.quickchat.presentation.screens.authorization.ContainerFragment.profile
+package com.example.quickchat.presentation.screens.containerFragment.profile
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -22,7 +22,6 @@ class ProfileViewModel @Inject constructor(
 
     private val _profileItems = MutableStateFlow<List<ProfileItem>>(emptyList())
     val profileItems = _profileItems.asStateFlow()
-
     private val user = MutableStateFlow<UsersModel?>(null)
 
     init {
@@ -30,38 +29,21 @@ class ProfileViewModel @Inject constructor(
         loadProfileItems()
     }
 
-
     fun logOutUser() = viewModelScope.launch{
         when(val status = logOutUserUseCase.execute()){
-            is OperationStatus.Success -> {
+            is OperationStatus.Success -> {}
+            is OperationStatus.Failure -> {}
 
-            }
-
-            is OperationStatus.Failure -> {
-
-            }
-
-            is OperationStatus.Loading -> {
-
-            }
         }
     }
 
     private fun getUserProfileUseCase() = viewModelScope.launch {
         when (val status = getUserProfileUseCase.execute()) {
             is OperationStatus.Success -> {
-                Log.d("MyLog", "$status")
                 user.emit(status.value)
                 loadProfileItems()
             }
-
-            is OperationStatus.Failure -> {
-
-            }
-
-            is OperationStatus.Loading -> {
-
-            }
+            is OperationStatus.Failure -> {}
         }
     }
 
@@ -85,5 +67,4 @@ class ProfileViewModel @Inject constructor(
             )
         )
     }
-
 }

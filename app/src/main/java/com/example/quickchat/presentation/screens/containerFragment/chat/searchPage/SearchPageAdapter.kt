@@ -1,4 +1,4 @@
-package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.searchPage
+package com.example.quickchat.presentation.screens.containerFragment.chat.searchPage
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

@@ -1,4 +1,4 @@
-package com.example.quickchat.presentation.screens.authorization.ContainerFragment
+package com.example.quickchat.presentation.screens.containerFragment
 
 import android.view.View
 import androidx.navigation.NavController
@@ -32,9 +32,9 @@ class ContainerFragment :
                 R.id.searchPageFragment -> {
                     binding.bottomNavigationView.visibility = View.INVISIBLE
                 }
+
                 else -> binding.bottomNavigationView.visibility = View.VISIBLE
             }
         }
     }
-
 }

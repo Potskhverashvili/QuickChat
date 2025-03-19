@@ -1,4 +1,4 @@
-package com.example.quickchat.presentation.screens.authorization.ContainerFragment.profile
+package com.example.quickchat.presentation.screens.containerFragment.profile
 
 import java.util.UUID
 

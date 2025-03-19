@@ -17,39 +17,19 @@ class MainViewModel @Inject constructor(
     private val getCurrentUserUseCase: GetCurrentUserUseCase
 ) : ViewModel() {
 
+    //TODO handle Success and Failure
     fun setUserStatusOnline() = viewModelScope.launch {
-
         when (val status = setUserStatusOnlineUseCase.execute()) {
-            is OperationStatus.Success -> {
-
-            }
-
-            is OperationStatus.Failure -> {
-
-            }
-
-            is OperationStatus.Loading -> {
-
-            }
+            is OperationStatus.Success -> {}
+            is OperationStatus.Failure -> {}
         }
-
     }
 
     fun setUserStatusOffline() = viewModelScope.launch {
         when (val status = setUserStatusOfflineUseCase.execute()) {
-            is OperationStatus.Success -> {
-
-            }
-
-            is OperationStatus.Failure -> {
-
-            }
-
-            is OperationStatus.Loading -> {
-
-            }
+            is OperationStatus.Success -> {}
+            is OperationStatus.Failure -> {}
         }
-
     }
 
     fun getCurrentUser(): Boolean {
@@ -59,16 +39,9 @@ class MainViewModel @Inject constructor(
                 is OperationStatus.Success -> {
                     result = true
                 }
-
-                is OperationStatus.Failure -> {
-                }
-
-                is OperationStatus.Loading -> {
-
-                }
+                is OperationStatus.Failure -> {}
             }
         }
         return result
     }
-
 }

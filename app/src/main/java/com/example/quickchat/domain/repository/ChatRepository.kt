@@ -5,7 +5,6 @@ import com.example.quickchat.domain.model.MessageModel
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
-
     suspend fun createOrGetChatSession(
         currentUserUid: String,
         otherUserUid: String
@@ -21,5 +20,4 @@ interface ChatRepository {
     suspend fun listenForMessages(
         chatId: String,
     ): Flow<MessageModel>
-
 }

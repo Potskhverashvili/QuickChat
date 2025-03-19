@@ -9,10 +9,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.quickchat.core.BaseFragment
 import com.example.quickchat.databinding.FragmentLoginBinding
-import com.example.quickchat.presentation.screens.authorization.register.RegisterViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @AndroidEntryPoint
 class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::inflate) {
@@ -32,12 +30,10 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
                 viewModel.loginUser(email, password)
             }
         }
-
         registerBtn.setOnClickListener {
             goToRegisterFragment()
         }
     }
-
 
     private fun setCollectors() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -64,7 +60,6 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
             }
         }
     }
-
 
     private fun goToHomeFragment() {
         findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToContainerFragment())

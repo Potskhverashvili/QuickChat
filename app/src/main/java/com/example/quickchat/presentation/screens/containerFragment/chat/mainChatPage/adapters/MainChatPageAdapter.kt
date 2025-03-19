@@ -1,4 +1,4 @@
-package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.mainChatPage.adapters
+package com.example.quickchat.presentation.screens.containerFragment.chat.mainChatPage.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -9,8 +9,7 @@ import com.example.quickchat.databinding.ItemSearchBinding
 import com.example.quickchat.databinding.ItemUserBinding
 import com.example.quickchat.domain.model.UsersModel
 
-class MainChatPageAdapter()
-    : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class MainChatPageAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var onlineUserAdapter = OnlineUserAdapter()
     private var userList: List<UsersModel> = emptyList()

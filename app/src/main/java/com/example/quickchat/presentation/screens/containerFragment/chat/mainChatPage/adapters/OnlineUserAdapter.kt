@@ -1,4 +1,4 @@
-package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.mainChatPage.adapters
+package com.example.quickchat.presentation.screens.containerFragment.chat.mainChatPage.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -21,7 +21,6 @@ class OnlineUserAdapter :
                 onActiveUserClick.invoke()
             }
         }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = OnlineUserViewHolder(

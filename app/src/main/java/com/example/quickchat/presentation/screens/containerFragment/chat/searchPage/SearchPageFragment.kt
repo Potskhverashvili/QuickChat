@@ -1,4 +1,4 @@
-package com.example.quickchat.presentation.screens.authorization.ContainerFragment.chat.searchPage
+package com.example.quickchat.presentation.screens.containerFragment.chat.searchPage
 
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
@@ -15,7 +15,6 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class SearchPageFragment :
     BaseFragment<FragmentSearchPageBinding>(FragmentSearchPageBinding::inflate) {
-
     private val viewModel by viewModels<SearchPageViewModel>()
     private val searchPageAdapter = SearchPageAdapter()
 
@@ -35,7 +34,7 @@ class SearchPageFragment :
 
     private fun setListeners() {
         binding.btnSearch.doAfterTextChanged { newInputQuery ->
-            viewModel.searchedMovieWithQuery(newInputQuery.toString())
+            viewModel.searchedUserWithQuery(newInputQuery.toString())
         }
 
         searchPageAdapter.onSearchedUserClicked = { user->

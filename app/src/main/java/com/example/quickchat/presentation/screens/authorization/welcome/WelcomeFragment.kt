@@ -5,7 +5,6 @@ import com.example.quickchat.core.BaseFragment
 import com.example.quickchat.databinding.FragmentWelcomeBinding
 
 class WelcomeFragment : BaseFragment<FragmentWelcomeBinding>(FragmentWelcomeBinding::inflate) {
-
     override fun viewCreated() {
         goToRegister()
     }
@@ -15,5 +14,4 @@ class WelcomeFragment : BaseFragment<FragmentWelcomeBinding>(FragmentWelcomeBind
             findNavController().navigate(WelcomeFragmentDirections.actionWelcomeFragmentToRegisterFragment())
         }
     }
-
 }
