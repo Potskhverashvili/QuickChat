@@ -1,5 +1,6 @@
 package com.example.quickchat.presentation.screens.authorization.ContainerFragment
 
+import android.view.View
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -22,6 +23,18 @@ class ContainerFragment :
         navController = navHostFragment.navController
         binding.bottomNavigationView.setupWithNavController(navController)
 
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.personalChatFragment -> {
+                    binding.bottomNavigationView.visibility = View.INVISIBLE
+                }
+
+                R.id.searchPageFragment -> {
+                    binding.bottomNavigationView.visibility = View.INVISIBLE
+                }
+                else -> binding.bottomNavigationView.visibility = View.VISIBLE
+            }
+        }
     }
 
 }

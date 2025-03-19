@@ -1,5 +1,6 @@
 package com.example.quickchat.data.repository
 
+import android.util.Log
 import android.util.Log.d
 import com.example.quickchat.core.FirebaseCallHelper
 import com.example.quickchat.core.OperationStatus
@@ -116,9 +117,29 @@ class FirebaseRepositoryImpl @Inject constructor(
     override suspend fun getUserById(userId: String): OperationStatus<UsersModel> {
         return FirebaseCallHelper.safeFirebaseCall {
             val document = firestore.collection("users").document(userId).get().await()
-            val user = document.toObject(UsersModel::class.java) ?: throw Exception("User not found")
+            if (!document.exists()) {
+                throw Exception("User not found")
+            }
+            // Log the raw document data for debugging
+            Log.d("checkUserByID", "Raw document data: ${document.data}")
 
-            d("checkUserByID", "$user")
+            // Extract data from the Firestore document
+            val name = document.getString("username")
+            val userImage = document.getLong("userImage")?.toInt()
+            val userEmail = document.getString("email")
+            val statusString = document.getString("status")
+
+            // Convert status to enum
+            val status = statusString?.let { UserStatus.valueOf(it) } ?: UserStatus.OFFLINE
+
+            // Create UsersModel instance
+            val user = UsersModel(
+                id = userId,
+                name = name,
+                userImage = userImage,
+                userEmail = userEmail,
+                status = status
+            )
             user
         }
     }
@@ -128,10 +149,16 @@ class FirebaseRepositoryImpl @Inject constructor(
         return FirebaseCallHelper.safeFirebaseCall {
             val user = getCurrentUser()
             if (user is OperationStatus.Success) {
-                firestore.collection("users").document(user.value.uid)
-                    .update("status", UserStatus.ONLINE)
+                firestore.runTransaction { transaction ->
+                    val docRef = firestore.collection("users").document(user.value.uid)
+                    transaction.update(docRef, "status", UserStatus.ONLINE)
+                    transaction.update(
+                        docRef,
+                        "lastUpdated",
+                        System.currentTimeMillis()
+                    ) // Ensure immediate update
+                }.await()
             }
-
         }
     }
 
@@ -139,13 +166,18 @@ class FirebaseRepositoryImpl @Inject constructor(
         return FirebaseCallHelper.safeFirebaseCall {
             val user = getCurrentUser()
             if (user is OperationStatus.Success) {
-                firestore.collection("users").document(user.value.uid)
-                    .update("status", UserStatus.OFFLINE)
+                firestore.runTransaction { transaction ->
+                    val docRef = firestore.collection("users").document(user.value.uid)
+                    transaction.update(docRef, "status", UserStatus.OFFLINE)
+                    transaction.update(
+                        docRef,
+                        "lastUpdated",
+                        System.currentTimeMillis()
+                    ) // Force sync
+                }.await()
             }
         }
     }
-
-    // -------------------------- Chat -----------------------
 
 }
 

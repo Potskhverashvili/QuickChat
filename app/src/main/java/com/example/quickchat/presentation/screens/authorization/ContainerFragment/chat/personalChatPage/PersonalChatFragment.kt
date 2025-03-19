@@ -25,6 +25,7 @@ class PersonalChatFragment :
 
     override fun viewCreated() {
         curUser.uid?.let { viewModel.createOrGetChatSession(it, args.userUid) }
+        viewModel.getCurrentUserToMessage(args.userUid)
         prepareRecyclerView()
         setListeners()
         setCollectors()
@@ -45,7 +46,7 @@ class PersonalChatFragment :
         sendButton.setOnClickListener {
             Log.d("PersonalChatFragment", "Send button clicked!")
             startMessaging()
-            messageEditText.text.clear()
+            messageEditText.text?.clear()
         }
     }
 
@@ -78,6 +79,14 @@ class PersonalChatFragment :
                     binding.messagesRecyclerView.post {
                         binding.messagesRecyclerView.scrollToPosition(messages.size - 1)
                     }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.userToMessageName.collect { personToMessageName ->
+                    binding.userNameTv.text = personToMessageName.name.toString()
                 }
             }
         }
