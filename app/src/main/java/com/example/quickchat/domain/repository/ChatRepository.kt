@@ -6,14 +6,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
     suspend fun createOrGetChatSession(
-        currentUserUid: String,
         otherUserUid: String
     ): OperationStatus<String>
 
     suspend fun sendMessage(
         chatId: String,
-        senderEmail: String,
-        senderUid: String,
         text: String
     )
 

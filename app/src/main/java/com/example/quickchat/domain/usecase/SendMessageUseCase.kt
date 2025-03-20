@@ -8,14 +8,10 @@ class SendMessageUseCase @Inject constructor(
 ) {
     suspend fun execute(
         chatId: String,
-        senderEmail: String,
-        senderUid: String,
         text: String
     ) {
         chatRepository.sendMessage(
             chatId = chatId,
-            senderEmail = senderEmail,
-            senderUid = senderUid,
             text = text
         )
     }

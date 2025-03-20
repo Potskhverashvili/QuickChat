@@ -10,6 +10,7 @@ import com.example.quickchat.domain.usecase.GetUserByIdUseCase
 import com.example.quickchat.domain.usecase.ListenerForMessagesUseCase
 import com.example.quickchat.domain.usecase.SendMessageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -49,9 +50,11 @@ class PersonalChatViewModel @Inject constructor(
         }
     }
 
-    fun createOrGetChatSession(currentUserUid: String, otherUserUid: String) =
+    fun createOrGetChatSession(otherUserUid: String) =
         viewModelScope.launch {
-            when (val status = createOrGetChatSession.execute(currentUserUid, otherUserUid)) {
+            _loadingState.emit(true)
+            delay(500)
+            when (val status = createOrGetChatSession.execute(otherUserUid)) {
                 is OperationStatus.Success -> {
                     getReceiverUser(otherUserUid)
                     _chatId.emit(status.value)
@@ -60,16 +63,15 @@ class PersonalChatViewModel @Inject constructor(
 
                 is OperationStatus.Failure -> {}
             }
+            _loadingState.emit(false)
         }
 
     fun sendMessage(
         chatId: String,
-        senderEmail: String,
-        senderUid: String,
         messageText: String
     ) = viewModelScope.launch {
         _loadingState.emit(true)
-        sendMessageUseCase.execute(chatId, senderEmail, senderUid, messageText)
+        sendMessageUseCase.execute(chatId, messageText)
         _loadingState.emit(false)
     }
 

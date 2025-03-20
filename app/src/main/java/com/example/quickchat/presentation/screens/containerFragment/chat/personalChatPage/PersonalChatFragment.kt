@@ -1,5 +1,6 @@
 package com.example.quickchat.presentation.screens.containerFragment.chat.personalChatPage
 
+import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -18,11 +19,10 @@ class PersonalChatFragment :
     BaseFragment<FragmentPersonalChatBinding>(FragmentPersonalChatBinding::inflate) {
     private val args: PersonalChatFragmentArgs by navArgs()
     private val viewModel by viewModels<PersonalChatViewModel>()
-    private val curUser = FirebaseAuth.getInstance() //TODO take in the repo
     private val personalAdapter = PersonalChatAdapter()
 
     override fun viewCreated() {
-        curUser.uid?.let { viewModel.createOrGetChatSession(it, args.receiverUid) }
+        viewModel.createOrGetChatSession(args.receiverUid)
         prepareRecyclerView()
         setListeners()
         setCollectors()
@@ -48,14 +48,10 @@ class PersonalChatFragment :
 
     private fun sendMessage() {
         val chatId = viewModel.chatId.value
-        val senderEmail = curUser.currentUser?.email
-        val senderUid = curUser.uid
         val messageText = binding.messageEditText.text.toString().trim()
 
         if (chatId != null) {
-            if (senderEmail != null && senderUid != null) {
-                viewModel.sendMessage(chatId, senderEmail, senderUid, messageText)
-            }
+            viewModel.sendMessage(chatId, messageText)
         } else {
             Toast.makeText(requireContext(), "Chat not initialized yet.", Toast.LENGTH_SHORT).show()
         }
@@ -80,5 +76,42 @@ class PersonalChatFragment :
                 }
             }
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.loadingState.collect { loading ->
+                    if (loading) {
+                        loadingVisibleTrue()
+                    } else {
+                        loadingInvisibleFalse()
+                    }
+                }
+            }
+        }
+
     }
+
+
+    private fun loadingVisibleTrue() = with(binding) {
+        progressBar.visibility = View.VISIBLE
+        backBtn.visibility = View.INVISIBLE
+        userCircularImage.visibility = View.INVISIBLE
+        userInfoContainer.visibility = View.INVISIBLE
+        callBtn.visibility = View.INVISIBLE
+        messagesRecyclerView.visibility = View.INVISIBLE
+        messageEditText.visibility = View.INVISIBLE
+        sendButton.visibility = View.INVISIBLE
+    }
+
+    private fun loadingInvisibleFalse() = with(binding) {
+        progressBar.visibility = View.INVISIBLE
+        backBtn.visibility = View.VISIBLE
+        userCircularImage.visibility = View.VISIBLE
+        userInfoContainer.visibility = View.VISIBLE
+        callBtn.visibility = View.VISIBLE
+        messagesRecyclerView.visibility = View.VISIBLE
+        messageEditText.visibility = View.VISIBLE
+        sendButton.visibility = View.VISIBLE
+    }
+
 }

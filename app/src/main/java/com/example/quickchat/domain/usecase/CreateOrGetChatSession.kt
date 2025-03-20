@@ -8,9 +8,8 @@ class CreateOrGetChatSession @Inject constructor(
     private val chatRepository: ChatRepository
 ) {
     suspend fun execute(
-        currentUserUid: String,
         otherUserUid: String
     ): OperationStatus<String> {
-        return chatRepository.createOrGetChatSession(currentUserUid, otherUserUid)
+        return chatRepository.createOrGetChatSession(otherUserUid)
     }
 }
