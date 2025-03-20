@@ -50,13 +50,13 @@ class PersonalChatViewModel @Inject constructor(
         }
     }
 
-    fun createOrGetChatSession(otherUserUid: String) =
+    fun createOrGetChatSession(receiverUid: String) =
         viewModelScope.launch {
             _loadingState.emit(true)
             delay(500)
-            when (val status = createOrGetChatSession.execute(otherUserUid)) {
+            when (val status = createOrGetChatSession.execute(receiverUid)) {
                 is OperationStatus.Success -> {
-                    getReceiverUser(otherUserUid)
+                    getReceiverUser(receiverUid)
                     _chatId.emit(status.value)
                     listenForMessages(status.value)
                 }

@@ -9,8 +9,6 @@ import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -18,30 +16,23 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class ChatRepositoryImpl @Inject constructor(
-    //TODO to use in the functions
     private val auth: FirebaseAuth,
-    private val firestore: FirebaseFirestore,
-    private var database: FirebaseDatabase
+    private var databaseReference: DatabaseReference
 ) : ChatRepository {
     private var chatRef: DatabaseReference? = null
 
     override suspend fun createOrGetChatSession(
-        otherUserUid: String
+        receiverUid: String
     ): OperationStatus<String> {
         return FirebaseCallHelper.safeFirebaseCall {
-            val firebaseDatabase = FirebaseDatabase
-                .getInstance("https://quickchat-d765e-default-rtdb.europe-west1.firebasedatabase.app/")
-                .getReference("messages")
-
             val currentUserUid = auth.currentUser?.uid ?: ""
-
-            val chatId = listOf(currentUserUid, otherUserUid).sorted().joinToString("_")
-            val chatRef = firebaseDatabase.child(chatId)
+            val chatId = listOf(currentUserUid, receiverUid).sorted().joinToString("_")
+            val chatRef = databaseReference.child(chatId)
             val chatSnapshot = chatRef.get().await()
             if (!chatSnapshot.exists()) {
                 val chatData = mapOf(
                     "chatId" to chatId,
-                    "users" to listOf(currentUserUid, otherUserUid),
+                    "users" to listOf(currentUserUid, receiverUid),
                     "createdAt" to System.currentTimeMillis(),
                     "generalMessages" to mutableListOf<MessageModel>()
                 )
@@ -56,11 +47,7 @@ class ChatRepositoryImpl @Inject constructor(
         text: String
     ) {
         FirebaseCallHelper.safeFirebaseCall {
-            val firebaseDatabase = FirebaseDatabase
-                .getInstance("https://quickchat-d765e-default-rtdb.europe-west1.firebasedatabase.app/")
-                .getReference("messages")
-
-            val chatRef = firebaseDatabase.child(chatId)
+            val chatRef = databaseReference.child(chatId)
             val newMessageId = chatRef.child("generalMessages").push().key
             val senderEmail = auth.currentUser?.email
             val senderUid = auth.uid
@@ -71,7 +58,6 @@ class ChatRepositoryImpl @Inject constructor(
                 senderUid = senderUid,
                 timestamp = System.currentTimeMillis()
             )
-
             newMessageId?.let {
                 chatRef.child("generalMessages").child(it).setValue(newMessage).await()
             }
@@ -80,9 +66,7 @@ class ChatRepositoryImpl @Inject constructor(
     }
 
     override suspend fun listenForMessages(chatId: String): Flow<MessageModel> = callbackFlow {
-        val firebaseDatabase = FirebaseDatabase
-            .getInstance("https://quickchat-d765e-default-rtdb.europe-west1.firebasedatabase.app/")
-        chatRef = firebaseDatabase.getReference("messages")
+        chatRef = databaseReference
             .child(chatId)
             .child("generalMessages")
 

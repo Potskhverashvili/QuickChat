@@ -15,7 +15,6 @@ import javax.inject.Inject
 class FirebaseRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
-    private val database: FirebaseDatabase //TODO use or delete
 ) : FirebaseRepository {
 
     override suspend fun registerNewUser(
